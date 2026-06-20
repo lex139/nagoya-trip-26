@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<!-- saved from url=(0050)file:///Volumes/BOOTCAMP/Nagoya%20Trip%202026.html -->
+<html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trip Planner Template</title>
+  <style>
+    :root {
+      --ink: #1f1f1f;
+      --muted: #6a6a6a;
+      --line: #ece7dd;
+      --surface: #f7f5ef;
+      --card: #fff;
+      --accent: #c0392b;
+      --shadow: 0 1px 4px rgba(0,0,0,.08);
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--surface);
+      color: var(--ink);
+      display: block;
+      min-height: 100vh;
+      height: auto;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    button, input, textarea {
+      font: inherit;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--card);
+      border-bottom: 1px solid var(--line);
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .trip-title {
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .trip-title-editor {
+      display: flex;
+      align-items: center;
+      min-width: 240px;
+      flex: 1;
+    }
+
+    .trip-title-editor input,
+    .day-header-editor input,
+    .day-header-editor textarea {
+      width: 100%;
+      border: 1px solid #f1df88;
+      background: #fff;
+      color: var(--ink);
+      padding: 6px 8px;
+      border-radius: 6px;
+      outline: none;
+      font-size: 11px;
+    }
+
+    .day-header-editor textarea { min-height: 52px; resize: vertical; }
+
+    .day-tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: nowrap;
+      flex: 1;
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .day-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .day-btn {
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 11px;
+      transition: .15s ease;
+    }
+
+    .day-btn:hover { background: #f7f3ea; }
+    .day-btn.active {
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .day-action-group,
+    .schedule-action-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .day-action-btn,
+    .schedule-action-btn {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--muted);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 10px;
+      cursor: pointer;
+    }
+
+    .day-action-group,
+    .schedule-action-group {
+      display: none;
+    }
+
+    body.editing .day-action-group,
+    body.editing .schedule-action-group {
+      display: flex;
+    }
+
+    .view-toggle {
+      display: flex;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .view-btn, .edit-toggle-btn {
+      background: transparent;
+      color: var(--muted);
+      border: 0;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 11px;
+      transition: .15s ease;
+    }
+
+    .view-btn.active {
+      background: #222;
+      color: #fff;
+    }
+
+    .edit-toggle-btn.active {
+      background: #f0a500;
+      color: #fff;
+      border-radius: 8px;
+    }
+
+    .main {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+      overflow: visible;
+      align-items: stretch;
+    }
+
+    .plan-panel {
+      width: 52%;
+      flex: 0 0 52%;
+      min-width: 0;
+      border-right: 1px solid var(--line);
+      background: var(--card);
+      overflow-y: auto;
+      min-height: 0;
+      transition: width .2s ease;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .plan-panel.full {
+      width: 100%;
+      flex: 1 1 auto;
+    }
+    .plan-panel.gone {
+      width: 0;
+      flex: 0 0 0;
+      overflow: hidden;
+    }
+
+    .day-header {
+      position: sticky;
+      top: 0;
+      background: var(--card);
+      z-index: 5;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .day-header h2 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .day-header p {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .edit-banner {
+      display: none;
+      padding: 8px 16px;
+      background: #fff8de;
+      color: #7d5d00;
+      font-size: 11px;
+      border-bottom: 1px solid #ffe08a;
+    }
+
+    body.editing .edit-banner { display: block; }
+
+    .stop-list { padding: 6px 0 18px; }
+
+    .stop {
+      display: flex;
+      cursor: pointer;
+      transition: background .1s ease;
+    }
+
+    .stop:hover { background: #f8f5ee; }
+    body.editing .stop:hover { background: #fffbe7; }
+    .stop.editing-active { background: #fffbe7; }
+
+    .stop-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 46px;
+      padding-top: 14px;
+      flex-shrink: 0;
+    }
+
+    .stop-num {
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .stop-line {
+      width: 2px;
+      flex: 1;
+      min-height: 10px;
+      margin-top: 4px;
+      border-radius: 999px;
+      opacity: .22;
+    }
+
+    .stop-body {
+      flex: 1;
+      padding: 12px 14px 12px 4px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .stop:last-child .stop-body { border-bottom: none; }
+
+    .stop-time { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
+    .stop-time .time-bold { color: #c0392b; font-weight: 700; font-size: 12px; }
+    .stop-name { font-size: 13px; font-weight: 600; line-height: 1.4; }
+    .stop-detail { font-size: 12px; color: #4b4b4b; line-height: 1.6; margin-top: 4px; }
+
+    .stop-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .cost-badge {
+      white-space: nowrap;
+      font-size: 10px;
+      color: #15803d;
+      background: #effbf2;
+      border: 1px solid #c7f1d0;
+      border-radius: 999px;
+      padding: 2px 7px;
+    }
+
+    .expense-badge {
+      background: #e8f7ee;
+      border-color: #9ad6ad;
+    }
+
+    .stop-meta {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    .tag {
+      font-size: 10px;
+      color: var(--muted);
+      background: #f7f5ef;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px 7px;
+    }
+
+    .route-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 6px;
+      font-size: 11px;
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .route-btn {
+      margin-top: 6px;
+      align-self: flex-start;
+      border: 1px solid #d7e5ff;
+      background: #f7faff;
+      color: #2563eb;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 10px;
+      cursor: pointer;
+    }
+
+    .todo-list,
+    .expense-list {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .todo-item,
+    .expense-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+      text-align: left;
+    }
+
+    .expense-item .expense-text {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .expense-item .expense-amount {
+      color: #15803d;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .todo-item strong,
+    .expense-item strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .expense-total {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #15803d;
+      flex-wrap: wrap;
+    }
+
+    .transport-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--muted);
+      padding: 3px 0;
+    }
+
+    .edit-fields {
+      display: none;
+      margin-top: 10px;
+      padding: 10px;
+      background: #fffbe7;
+      border: 1px solid #f2dc88;
+      border-radius: 8px;
+      gap: 6px;
+      flex-direction: column;
+    }
+
+    body.editing .stop.editing-active .edit-fields { display: flex; }
+
+    .edit-fields input,
+    .edit-fields textarea {
+      width: 100%;
+      border: 1px solid #f1df88;
+      background: #fff;
+      color: var(--ink);
+      padding: 6px 8px;
+      border-radius: 6px;
+      outline: none;
+    }
+
+    .edit-fields textarea { min-height: 64px; resize: vertical; }
+    .edit-row { display: flex; gap: 6px; }
+    .edit-row > div { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+    .edit-fields label { font-size: 10px; color: #7a5a00; font-weight: 700; }
+
+    .save-btn {
+      align-self: flex-end;
+      background: #f0a500;
+      color: #fff;
+      border: 0;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .map-panel {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: #f4f1e8;
+    }
+
+    .map-panel.gone { display: none; }
+
+    .map-inner {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .map-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .map-inner h3 { font-size: 14px; font-weight: 700; }
+    .map-inner p { font-size: 12px; color: var(--muted); max-width: 300px; line-height: 1.6; }
+
+    .map-open-btn {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: var(--shadow);
+    }
+
+    .map-stop-list {
+      width: 100%;
+      max-width: 340px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .map-stop-item {
+      background: #fff;
+      border-radius: 10px;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .map-stop-num {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 10px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .map-stop-info { flex: 1; min-width: 0; }
+    .map-stop-name {
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .map-stop-time { font-size: 10px; color: var(--muted); }
+    .map-link { font-size: 10px; color: #2563eb; text-decoration: none; }
+
+    .route-legs-display { margin-top: 8px; }
+    .route-legs-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .route-legs-table th { color: var(--muted); font-weight: 700; padding: 2px 6px 2px 0; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+    .route-legs-table td { padding: 4px 6px 4px 0; border-bottom: 1px solid var(--line); color: #4b4b4b; }
+    .route-legs-table tr:last-child td { border-bottom: none; }
+    .leg-fee-cell { color: #15803d; font-weight: 600; white-space: nowrap; }
+
+    .route-leg-row { display: flex; gap: 4px; margin-bottom: 4px; align-items: flex-start; }
+    .route-leg-row input, .route-leg-row textarea { flex: 1; min-width: 0; border: 1px solid #f1df88; background: #fff; color: var(--ink); padding: 5px 6px; border-radius: 6px; outline: none; font-size: 11px; font-family: inherit; }
+    .route-leg-row textarea { resize: none; min-height: 38px; line-height: 1.4; overflow: hidden; }
+    .leg-add-btn { background: #e8f0e0; color: #3b6d11; border: 1px solid #c0dd97; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 10px; margin-top: 4px; font-family: inherit; }
+    .leg-del-btn { background: none; border: 1px solid #f1df88; border-radius: 4px; color: #c0392b; font-size: 10px; padding: 2px 6px; cursor: pointer; flex-shrink: 0; font-family: inherit; }
+
+    .map-link-row { display: flex; gap: 4px; margin-bottom: 4px; align-items: center; }
+    .map-link-row input { flex: 1; min-width: 0; border: 1px solid #f1df88; background: #fff; color: var(--ink); padding: 5px 6px; border-radius: 6px; outline: none; font-size: 11px; font-family: inherit; }
+    .map-link-row input:first-child { flex: 0 0 70px; }
+    .map-stop-links { display: flex; flex-wrap: wrap; gap: 4px; }
+
+    .day-cost-bar {
+      padding: 8px 16px;
+      background: var(--card);
+      border-top: 1px solid var(--line);
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .todo-page { padding: 16px; }
+    .todo-page h2 { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
+
+    .todo-add-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .todo-add-row input {
+      flex: 1;
+      min-width: 140px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font: inherit;
+      font-size: 12px;
+      outline: none;
+      background: #fff;
+    }
+    .todo-add-row select {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 6px 8px;
+      font: inherit;
+      font-size: 12px;
+      background: #fff;
+      outline: none;
+      cursor: pointer;
+    }
+    .todo-add-btn {
+      background: #4a7fa5;
+      color: #fff;
+      border: 0;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .todo-category-group { margin-bottom: 14px; }
+    .todo-category-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--line);
+    }
+    .todo-entry {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .todo-entry:last-child { border-bottom: none; }
+    .todo-entry input[type="checkbox"] { cursor: pointer; width: 15px; height: 15px; flex-shrink: 0; }
+    .todo-entry-text {
+      flex: 1;
+      font-size: 12px;
+      color: var(--ink);
+      line-height: 1.5;
+    }
+    .todo-entry-text.done {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+    .todo-del-btn {
+      background: none;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      color: var(--muted);
+      font-size: 10px;
+      padding: 2px 6px;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: none;
+    }
+    body.editing .todo-del-btn { display: inline-block; }
+
+    .todo-add-row { display: none; }
+    body.editing .todo-add-row { display: flex; }
+    .todo-progress {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .todo-progress span { color: #15803d; font-weight: 700; }
+
+    .day-cost-bar span { color: var(--ink); font-weight: 700; }
+
+    @media (max-width: 900px) {
+      body {
+        overflow-y: auto;
+      }
+      .main {
+        display: block;
+        flex-direction: column;
+        overflow: visible;
+        height: auto;
+      }
+      .plan-panel,
+      .plan-panel.full,
+      .plan-panel.gone {
+        width: 100%;
+        height: auto;
+        overflow: visible;
+        overflow-y: visible;
+      }
+      .map-panel { display: none; }
+      .topbar {
+        align-items: flex-start;
+        position: sticky;
+        top: 0;
+        width: 100%;
+      }
+      .trip-title {
+        width: 100%;
+      }
+      .day-tabs {
+        width: 100%;
+        padding-bottom: 2px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .day-btn {
+        flex: 0 0 auto;
+        padding: 5px 8px;
+        font-size: 10px;
+      }
+      .controls {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+<body data-new-gr-c-s-check-loaded="14.1304.0" data-gr-ext-installed="">
+  <div class="topbar">
+    <div class="trip-title" id="tripTitleDisplay">🇯🇵 名古屋・高山・上高地 28/6–3/7 2026</div>
+    <div class="trip-title-editor" id="tripTitleEditor" style="display:none;">
+      <input type="text" data-field="tripTitle" id="tripTitleInput" placeholder="Trip title">
+    </div>
+    <div class="day-action-group">
+      <button class="day-action-btn" id="removeDayBtn" title="Remove day">− Day</button>
+      <button class="day-action-btn" id="addDayBtn" title="Add day">+ Day</button>
+    </div>
+    <div class="day-tabs" id="dayTabs"><button class="day-btn active" style="background: rgb(192, 57, 43);">Day 1 · 6/28</button><button class="day-btn">Day 2 · 6/29</button><button class="day-btn">Day 3 · 6/30</button><button class="day-btn">Day 4 · 7/1</button><button class="day-btn">Day 5 · 7/2</button><button class="day-btn">Day 6 · 7/3</button><button class="day-btn">📋 準備清單</button></div>
+    <div class="controls">
+      <div class="view-toggle">
+        <button class="view-btn active" data-view="both">⊞ Split</button>
+        <button class="view-btn" data-view="plan">≡ Plan</button>
+        <button class="view-btn" data-view="map">⊙ Map</button>
+      </div>
+      <button class="edit-toggle-btn" id="editToggle">✏️ Edit</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <section class="plan-panel" id="planPanel" style="">
+      <div class="day-header">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+          <div>
+            <h2 id="dayTitle">名古屋機場 ➡️ 高山</h2>
+            <p id="daySub">6月28日（日）· 中部機場入境 · 名鉄 + JR 特急ひだ → 高山</p>
+          </div>
+          <div class="schedule-action-group">
+            <button class="schedule-action-btn" id="removeStopBtn" title="Remove stop">− Schedule</button>
+            <button class="schedule-action-btn" id="addStopBtn" title="Add stop">+ Schedule</button>
+          </div>
+        </div>
+        <div class="day-header-editor" id="dayHeaderEditor" style="display:none; margin-top:8px;">
+          <input type="text" data-field="dayTitle" id="dayTitleInput" placeholder="Day title">
+          <textarea data-field="daySubtitle" id="daySubtitleInput" placeholder="Day subtitle"></textarea>
+        </div>
+      </div>
+      <div id="todoContainer" style="display:none;"></div>
+      <div class="edit-banner">✏️ 編輯模式 — 點擊任何行程項目即可修改。</div>
+      <div class="stop-list" id="stopList"><div class="stop" style="cursor: default;">
+          <div class="stop-left">
+            <div class="stop-num" style="background:#c0392b">1</div>
+            <div class="stop-line" style="background:#c0392b"></div>
+          </div>
+          <div class="stop-body">
+            <div class="stop-time"><strong class="time-bold">10:50</strong>–15:50</div>
+            <div class="stop-head">
+              <div class="stop-name">✈️ UO690 香港 → 中部機場</div>
+              <span class="cost-badge expense-badge">HKD 7,313.89</span>
+            </div>
+            <div class="stop-detail">20kg 行李 · 隨身行李<br>Conf: UO690</div>
+            
+            <div class="stop-meta"><span class="tag">航班</span></div>
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+              
+            </div>
+            
+            <div class="expense-list"><div class="expense-item"><span>💸</span><span class="expense-text"><strong>機票</strong><span class="expense-amount">$6453.88</span></span></div><div class="expense-item"><span>💸</span><span class="expense-text"><strong>旅遊保</strong><span class="expense-amount">$410.01</span></span></div><div class="expense-item"><span>💸</span><span class="expense-text"><strong>SimCard</strong><span class="expense-amount">$450</span></span></div></div>
+            <div class="edit-fields">
+              <div class="edit-row">
+                <div><label>時間</label><input type="text" data-field="time" value="10:50–15:50"></div>
+                <div style="flex:0 0 auto; display:flex; flex-direction:column; gap:4px; justify-content:flex-end;">
+                  <label style="display:flex; align-items:center; gap:5px; cursor:pointer; white-space:nowrap;">
+                    <input type="checkbox" data-field="departBold" checked="">
+                    <span style="font-size:10px; color:#c0392b; font-weight:700;">出發 粗體</span>
+                  </label>
+                  <label style="display:flex; align-items:center; gap:5px; cursor:pointer; white-space:nowrap;">
+                    <input type="checkbox" data-field="arrivalBold">
+                    <span style="font-size:10px; color:#c0392b; font-weight:700;">抵達 粗體</span>
+                  </label>
+                </div>
+              </div>
+              <div><label>名稱</label><input type="text" data-field="name" value="✈️ UO690 香港 → 中部機場"></div>
+              <div><label>詳情</label><textarea data-field="detail">20kg 行李 · 隨身行李
+Conf: UO690</textarea></div>
+              <div><label>Label（每行一個 / 逗號分隔）</label><textarea data-field="tags" placeholder="巴士
+餐廳
+購物">航班</textarea></div>
+              <div><label>Route Link</label><input type="text" data-field="routeLink" value="" placeholder="https://..."></div>
+              <div>
+                <label>Google Maps 連結</label>
+                <div class="map-links-editor"><div class="map-link-row"><input type="text" data-ml-field="label" value="Maps" placeholder="標籤"><input type="text" data-ml-field="url" value="https://maps.app.goo.gl/nFLnFG12ck12LWDV7" placeholder="https://maps.google.com/..."><button class="leg-del-btn map-link-del" type="button">✕</button></div></div>
+                <button class="map-link-add-btn leg-add-btn" type="button">＋ 新增地圖連結</button>
+              </div>
+              <div><label>Info Link</label><input type="text" data-field="infoLink" value="" placeholder="https://..."></div>
+              <div>
+                <label>路線明細</label>
+                <div class="route-legs-editor"></div>
+                <button class="leg-add-btn route-leg-add-btn" type="button">＋ 新增路線</button>
+              </div>
+              <div><label>To-do</label><textarea data-field="todos" placeholder="Task 1 · ¥100
+Task 2 · ¥200"></textarea></div>
+              <div><label>Spent Items</label><textarea data-field="expenses" placeholder="早餐: ¥50
+門票: ¥120">機票: $6453.88
+旅遊保: $410.01
+SimCard: $450</textarea></div>
+              <button class="save-btn">Save ✓</button>
+            </div>
+          </div>
+        </div><div class="transport-divider">↓</div><div class="stop" style="cursor: pointer;">
+          <div class="stop-left">
+            <div class="stop-num" style="background:#c0392b">2</div>
+            <div class="stop-line" style="background:#c0392b"></div>
+          </div>
+          <div class="stop-body">
+            <div class="stop-time">17:30 -<strong class="time-bold"> 18:30</strong></div>
+            <div class="stop-head">
+              <div class="stop-name">🍽️ 晚餐 📍機場 T1 4樓 / T2 2樓</div>
+              
+            </div>
+            <div class="stop-detail">先寄存行李（交通廣場2樓 24hrs / 4樓)</div>
+            
+            <div class="stop-meta"></div>
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+              
+            </div>
+            
+            
+            <div class="edit-fields">
+              <div class="edit-row">
+                <div><label>時間</label><input type="text" data-field="time" value="17:30 - 18:30"></div>
+                <div style="flex:0 0 auto; display:flex; flex-direction:column; gap:4px; justify-content:flex-end;">
+                  <label style="display:flex; align-items:center; gap:5px; cursor:pointer; white-space:nowrap;">
+                    <input type="checkbox" data-field="departBold">
+                    <span style="font-size:10px; color:#c0392b; font-weight:700;">出發 粗體</span>
+                  </label>
+                  <label style="display:flex; align-items:center; gap:5px; cursor:pointer; white-space:nowrap;">
+                    <input type="checkbox" data-field="arrivalBold" checked="">
+                    <span style="font-size:10px; color:#c0392b; font-weight:700;">抵達 粗體</span>
+                  </label>
+                </div>
+              </div>
+              <div><label>名稱</label><input type="text" data-field="name" value="🍽️ 晚餐 📍機場 T1 4樓 / T2 2樓"></div>
+              <div><label>詳情</label><textarea data-field="detail">先寄存行李（交通廣場2樓 24hrs / 4樓)</textarea></div>
+              <div><label>Label（每行一個 / 逗號分隔）</label><textarea data-field="tags" placeholder="巴士
+餐廳
+購物"></textarea></div>
+              <div><label>Route Link</label><input type="text" data-field="routeLink" value="" placeholder="https://..."></div>
+              <div>
+                <label>Google Maps 連結</label>
+                <div class="map-links-editor"><div class="map-link-row"><input type="text" data-ml-field="label" value="Maps" placeholder="標籤"><input type="text" data-ml-field="url" value="https://maps.app.goo.gl/nFLnFG12ck12LWDV7" placeholder="https://maps.google.com/..."><button class="leg-del-btn map-link-del" type="button">✕</button></div></div>
+                <button class="map-link-add-btn leg-add-btn" type="button">＋ 新增地圖連結</button>
+              </div>
+              <div><label>Info Link</label><input type="text" data-field="infoLink" value="https://www.centrair.jp/tzh/shop-dine/restaurant/index.html" placeholder="https://..."></div>
+              <div>
+                <label>路線明細</label>
+                <div class="route-legs-editor"></div>
+                <button class="leg-add-btn route-leg-add-btn" type="button">＋ 新增路線</button>
+              </div>
+              <div><label>To-do</label><textarea data-field="todos" placeholder="Task 1 · ¥100
+Task 2 · ¥200"></textarea></div>
+              <div><label>Spent Items</label><textarea data-field="expenses" placeholder="早餐: ¥50
+門票: ¥120"></textarea></div>
+              <button class="save-btn">Save ✓</button>
+            </div>
+          </div>
+        </div><div class="transport-divider">↓</div><div class="stop" style="cursor: default;">
+          <div class="stop-left">
+            <div class="stop-num" style="background:#c0392b">3</div>
+            
+          </div>
+          <div class="stop-body">
+            <div class="stop-time"><strong class="time-bold">18:45</strong>-23:00</div>
+            <div class="stop-head">
+              <div class="stop-name">🚄 中部機場 (2樓交通廣場) → 高山酒店</div>
+              <span class="cost-badge expense-badge">¥2,860 · HKD 620</span>
+            </div>
+            <div class="stop-detail"></div>
+            <div class="route-legs-display"><table class="route-legs-table"><tbody><tr><td style="white-space:nowrap">19:07</td><td>ミュースカイ(全車特別車) (名鉄名古屋行)</td><td>名鉄名古屋</td><td style="white-space:nowrap">29分鐘</td><td class="leg-fee-cell">2860</td></tr><tr><td style="white-space:nowrap"></td><td>步行</td><td>JR名古屋站</td><td style="white-space:nowrap">6分鐘</td><td class="leg-fee-cell"></td></tr><tr><td style="white-space:nowrap">20:17-22:49</td><td>ＪＲ東海道本線特急ひだ19号 （高山行）</td><td>高山</td><td style="white-space:nowrap">2小時32分鐘</td><td class="leg-fee-cell">$620</td></tr></tbody></table></div>
+            <div class="stop-meta"><span class="tag">μ-SKY</span><span class="tag">ＪＲ東海道本線特急ひだ19号</span></div>
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+              <button class="route-btn" data-route-btn="true" type="button">Route</button>
+            </div>
+            
+            
+            <div class="edit-fields">
+              <div class="edit-row">
+                <div><label>時間</label><input type="text" data-field="time" value="18:45-23:00"></div>
+                <div style="flex:0 0 auto; display:flex; flex-direction:column; gap:4px; justify-content:flex-end;">
+                  <label style="display:flex; align-items:center; gap:5px; cursor:pointer; white-space:nowrap;">
+                    <input type="checkbox" data-field="departBold" checked="">
+                    <span style="font-size:10px; color:#c0392b; font-weight:700;">出發 粗體</span>
+                  </label>
+                  <label style="display:flex; align-items:center; gap:5px; cursor:pointer; white-space:nowrap;">
+                    <input type="checkbox" data-field="arrivalBold">
+                    <span style="font-size:10px; color:#c0392b; font-weight:700;">抵達 粗體</span>
+                  </label>
+                </div>
+              </div>
+              <div><label>名稱</label><input type="text" data-field="name" value="🚄 中部機場 (2樓交通廣場) → 高山酒店"></div>
+              <div><label>詳情</label><textarea data-field="detail"></textarea></div>
+              <div><label>Label（每行一個 / 逗號分隔）</label><textarea data-field="tags" placeholder="巴士
+餐廳
+購物">μ-SKY
+ＪＲ東海道本線特急ひだ19号</textarea></div>
+              <div><label>Route Link</label><input type="text" data-field="routeLink" value="https://trainbus.meitetsu.co.jp/meitetsu-transfer-zh-tw/pc/transfer/TransferSearchSelect?orvName=%E4%B8%AD%E9%83%A8%E5%9C%8B%E9%9A%9B%E6%A9%9F%E5%A0%B4%28TA24%29&amp;orvNode=&amp;dnvName=%E5%90%8D%E9%90%B5%E5%90%8D%E5%8F%A4%E5%B1%8B%28NH36%29&amp;dnvNode=&amp;month=2026%2F6&amp;day=28&amp;hour=18&amp;minute=45&amp;basis=1&amp;sort=0&amp;wspeed=standard&amp;method=0&amp;unuse=&amp;month_select=on&amp;day_select=on&amp;hour_select=on&amp;minute_select=on" placeholder="https://..."></div>
+              <div>
+                <label>Google Maps 連結</label>
+                <div class="map-links-editor"><div class="map-link-row"><input type="text" data-ml-field="label" value="高山酒店" placeholder="標籤"><input type="text" data-ml-field="url" value="https://maps.app.goo.gl/BXnCny7tBJDmgv858" placeholder="https://maps.google.com/..."><button class="leg-del-btn map-link-del" type="button">✕</button></div></div>
+                <button class="map-link-add-btn leg-add-btn" type="button">＋ 新增地圖連結</button>
+              </div>
+              <div><label>Info Link</label><input type="text" data-field="infoLink" value="" placeholder="https://..."></div>
+              <div>
+                <label>路線明細</label>
+                <div class="route-legs-editor"><div class="route-leg-row"><input type="text" data-leg-field="time" value="19:07" placeholder="時間"><textarea data-leg-field="type" placeholder="交通工具">ミュースカイ(全車特別車) (名鉄名古屋行)</textarea><textarea data-leg-field="stop" placeholder="站名">名鉄名古屋</textarea><input type="text" data-leg-field="duration" value="29分鐘" placeholder="車程"><input type="text" data-leg-field="fee" value="2860" placeholder="費用"><button class="leg-del-btn" type="button">✕</button></div><div class="route-leg-row"><input type="text" data-leg-field="time" value="" placeholder="時間"><textarea data-leg-field="type" placeholder="交通工具">步行</textarea><textarea data-leg-field="stop" placeholder="站名">JR名古屋站</textarea><input type="text" data-leg-field="duration" value="6分鐘" placeholder="車程"><input type="text" data-leg-field="fee" value="" placeholder="費用"><button class="leg-del-btn" type="button">✕</button></div><div class="route-leg-row"><input type="text" data-leg-field="time" value="20:17-22:49" placeholder="時間"><textarea data-leg-field="type" placeholder="交通工具">ＪＲ東海道本線特急ひだ19号 （高山行）</textarea><textarea data-leg-field="stop" placeholder="站名">高山</textarea><input type="text" data-leg-field="duration" value="2小時32分鐘" placeholder="車程"><input type="text" data-leg-field="fee" value="$620" placeholder="費用"><button class="leg-del-btn" type="button">✕</button></div></div>
+                <button class="leg-add-btn route-leg-add-btn" type="button">＋ 新增路線</button>
+              </div>
+              <div><label>To-do</label><textarea data-field="todos" placeholder="Task 1 · ¥100
+Task 2 · ¥200"></textarea></div>
+              <div><label>Spent Items</label><textarea data-field="expenses" placeholder="早餐: ¥50
+門票: ¥120"></textarea></div>
+              <button class="save-btn">Save ✓</button>
+            </div>
+          </div>
+        </div></div>
+      <div class="day-cost-bar" id="costBar">今日消費: <span>¥2,860</span> | <span>$7,933.89</span></div>
+    </section>
+
+    <section class="map-panel" id="mapPanel">
+      <div class="map-inner">
+        <div class="map-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.8">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"></path>
+            <circle cx="12" cy="9" r="2.4"></circle>
+          </svg>
+        </div>
+        <h3 id="mapTitle">名古屋機場 ➡️ 高山 — 3 stops</h3>
+        <p>點擊任何行程項目在 Google Maps 中查看，或開啟當日完整路線。</p>
+        <button class="map-open-btn" id="routeButton">在 Google Maps 開啟完整路線 ↗</button>
+        <div class="map-stop-list" id="mapStops"><div class="map-stop-item">
+          <div class="map-stop-num" style="background:#c0392b">1</div>
+          <div class="map-stop-info">
+            <div class="map-stop-name">✈️ UO690 香港 → 中部機場</div>
+            <div class="map-stop-time">10:50–15:50 · HKD 6,453</div>
+          </div>
+          <div class="map-stop-links"><a class="map-link" href="https://maps.app.goo.gl/nFLnFG12ck12LWDV7" target="_blank">Maps ↗</a></div>
+        </div><div class="map-stop-item">
+          <div class="map-stop-num" style="background:#c0392b">2</div>
+          <div class="map-stop-info">
+            <div class="map-stop-name">🍽️ 晚餐 📍機場 T1 4樓 / T2 2樓</div>
+            <div class="map-stop-time">17:30 - 18:30</div>
+          </div>
+          <div class="map-stop-links"><a class="map-link" href="https://maps.app.goo.gl/nFLnFG12ck12LWDV7" target="_blank">Maps ↗</a></div>
+        </div><div class="map-stop-item">
+          <div class="map-stop-num" style="background:#c0392b">3</div>
+          <div class="map-stop-info">
+            <div class="map-stop-name">🚄 中部機場 (2樓交通廣場) → 高山酒店</div>
+            <div class="map-stop-time">18:45-23:00</div>
+          </div>
+          <div class="map-stop-links"><a class="map-link" href="https://maps.app.goo.gl/BXnCny7tBJDmgv858" target="_blank">高山酒店 ↗</a></div>
+        </div></div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const DAYS = [
+      {
+        label: 'Day 1', shortDate: '6/28', color: '#c0392b',
+        title: '名古屋 → 高山 ✈️',
+        subtitle: '6月28日（日）· 中部機場入境 · 名鉄 + JR 特急ひだ → 高山',
+        stops: [
+          { time: '10:50–15:50', name: '✈️ UO690 香港 → 中部機場', detail: '20kg 行李 · 隨身行李\nConf: UO690', tags: ['航班'], cost: 'HKD 6,453', costUnit: 'HKD' },
+          { time: '17:30–18:30', name: '🍽 晚餐 — 中部機場', detail: 'T1 4樓 / T2 2樓餐廳\n順便寄存行李（交通廣場2樓，24hrs）', tags: ['餐廳'] },
+          { time: '19:17発', name: '🚃 名鉄常滑・空港線特急', detail: '名鉄岐阜行き → 名鉄名古屋\n～38分鐘', tags: ['電車', '名鉄'] },
+          { time: '20:10発', name: '🚃 名鉄名古屋本線特急', detail: '名鉄岐阜行き → 名鉄一宮\n～15分鐘 → 步行至尾張一宮（JR）～6分鐘', tags: ['電車', '名鉄'] },
+          { time: '20:29発', name: '🚃 JR東海道本線 特急ひだ19号', detail: '高山行き → 高山\n～2小時20分鐘', tags: ['JR', '特急'], cost: '¥17,820', costUnit: 'YEN' },
+          { time: '23:00頃', name: '🏨 抵達・Check-in 高山酒店', detail: '📍步行 1分鐘\n奥飛騨套票 ¥7,700/人', tags: ['酒店'] }
+        ]
+      },
+      {
+        label: 'Day 2', shortDate: '6/29', color: '#2e7d6b',
+        title: '🚠 新穗高纜車 → 高山老街',
+        subtitle: '6月29日（月）· 濃飛巴士 → 新穗高 · 纜車 · 飛驒牛燒肉',
+        stops: [
+          { time: '07:34–09:17', name: '🚌 高山酒店 → 新穗高溫泉站', detail: '步行至高山濃飛巴士中心（～3分鐘）\n09:34発 濃飛巴士 平湯・新穂高線\n→ 新穗高ロープウェイ ～1小時43分鐘', tags: ['巴士', '濃飛'], cost: '¥23,100', costUnit: 'YEN' },
+          { time: '09:20–11:00', name: '🚠 新穗高纜車', detail: '分兩段全程 ～25分鐘\n奥飛騨套票使用 · 坐回程纜車下山', tags: ['纜車', '奥飛騨套票'], cost: '套票' },
+          { time: '11:53–13:36', name: '🚌 新穗高溫泉站 → 高山', detail: '11:53発 濃飛巴士\n→ 高山濃飛バスセンター ～1小時52分鐘', tags: ['巴士', '濃飛'] },
+          { time: '14:00–16:00', name: '🏮 高山老街 — 上三之町', detail: 'こって牛 飛驒牛握壽司\n舩坂酒造店', tags: ['老街', '美食'] },
+          { time: '18:00–19:00', name: '🥩 晚餐 — 飛驒牛燒肉 丸明', detail: '高山最有名飛驒牛燒肉！', tags: ['燒肉', '晚餐'] }
+        ]
+      },
+      {
+        label: 'Day 3', shortDate: '6/30', color: '#4a7fa5',
+        title: '⛰️ 上高地',
+        subtitle: '6月30日（火）· 高山 → 平湯温泉 → 大正池 → 河童橋 → 明神池',
+        stops: [
+          { time: '08:15–09:38', name: '🚌 高山酒店 → 平湯温泉站', detail: '步行至高山濃飛巴士中心（～3分鐘）\n08:40発 平湯・新穂高線\n→ 平湯温泉 ～58分鐘（不用預約）', tags: ['巴士', '濃飛'] },
+          { time: '10:00–10:20', name: '🚌 平湯温泉 → 大正池站', detail: '00分・30分発 上高地線\n→ 大正池 ～16分鐘（不用預約）\n買熊鈴🔔', tags: ['巴士', '上高地'], cost: '¥8,400', costUnit: 'YEN' },
+          { time: '10:30–11:45', name: '🚶 大正池 → 田代池 → 田代橋 → 河童橋', detail: '步行 ～1小時\n上午路線：大正池巴士站→田代池→田代橋→河童橋（約1h）', tags: ['健行', '免費'], cost: 'Free' },
+          { time: '12:30–13:45', name: '🚶 河童橋 → 梓川右岸 → 明神池', detail: '步行 ～1小時\n下午路線：河童橋→梓川右岸→明神池', tags: ['健行', '免費'], cost: 'Free' },
+          { time: '16:00–16:30', name: '🚌 上高地 → 平湯温泉', detail: '00分・30分発\n→ 平湯温泉 ～25分鐘\n尾班車 17:30', tags: ['巴士'] }
+        ]
+      },
+      {
+        label: 'Day 4', shortDate: '7/1', color: '#8b5e3c',
+        title: '高山 → 名古屋 🏙️',
+        subtitle: '7月1日（水）· JR特急ひだ → 名古屋 · PARCO · ミキモト · Kindal',
+        stops: [
+          { time: '09:00–12:30', name: '🚃 高山酒店 → 名古屋站', detail: '步行至高山駅 ～1分鐘\n09:36発 JR高山本線 特急ひだ6号 名古屋行き\n→ 名古屋 桜通り口 ～2小時28分鐘', tags: ['JR', '特急ひだ'], cost: '¥17,820', costUnit: 'YEN' },
+          { time: '12:30頃', name: '🚇 名古屋站 → 伏見', detail: '名古屋市営東山線 藤が丘行き → 伏見 10號出口\n～2分鐘\n先寄存行李（15:00 Check-in）', tags: ['地下鐵', '東山線'], cost: '¥630', costUnit: 'YEN' },
+          { time: '13:00–15:30', name: '🍽 午餐 + 🛍️ PARCO', detail: '步行至伏見站 ～10分鐘 → 名城線 → 矢場町 出口4\n名古屋 PARCO 購物', tags: ['購物', '午餐'], cost: '¥210', costUnit: 'YEN' },
+          { time: '15:30–17:30', name: '💎 ミキモト 松坂屋名古屋店 — 珍珠', detail: '名古屋最有名珍珠店！\nKindal 二手服飾店 附近', tags: ['購物', '珍珠'] },
+          { time: '17:30頃', name: '🏨 酒店 Check-in — 名古屋', detail: '📍伏見駅 10號出口 步行 ～10分鐘', tags: ['酒店'] },
+          { time: '18:30–19:30', name: '🍽 晚餐 — 名古屋', detail: '名古屋名物！味噌煮込みうどん・味噌カツなど', tags: ['晚餐', '名古屋名物'] }
+        ]
+      },
+      {
+        label: 'Day 5', shortDate: '7/2', color: '#6b5b95',
+        title: '🐱 吉卜力公園',
+        subtitle: '7月2日（木）· 名古屋 → 藤が丘 → リニモ → 吉卜力公園 → 熱田蓬萊軒',
+        stops: [
+          { time: '09:00–10:15', name: '🚇 酒店 → 吉卜力公園', detail: '步行至伏見站 ～10分鐘\n東山線 藤が丘行き → 藤が丘 ～25分鐘 ¥310\nリニモ 八草行き → 愛・地球博記念公園 出口2 ～13分鐘 ¥360', tags: ['地下鐵', 'リニモ'], cost: '¥670', costUnit: 'YEN' },
+          { time: '10:30–17:00', name: '🌳 吉卜力公園 (Ghibli Park)', detail: '全日遊覽！\n龍貓森林・魔女宅急便・哈爾移動城堡等\n步行 ～8分鐘入園', tags: ['主題公園', '吉卜力'], cost: '票價另計' },
+          { time: '17:00–18:30', name: '🚇 吉卜力公園 → 熱田蓬萊軒', detail: 'リニモ → 藤が丘 ¥360\n東山線 → 本山\n名城線 → 熱田神宮伝馬町 出口1 ¥340\n步行 ～6分鐘\n\n⚠️ 先攞號碼飛！等候1-2小時', tags: ['電車'], cost: '¥700', costUnit: 'YEN' },
+          { time: '18:00–20:00', name: '🍱 晚餐 — 熱田蓬萊軒 鰻魚飯', detail: '名古屋最有名鰻魚飯！\n附近參觀 熱田神宮', tags: ['鰻魚飯', '晚餐', '必食'] },
+          { time: '20:00頃', name: '🚇 返酒店', detail: '熱田神宮伝馬町站\n名城線 → 栄 ¥240\n東山線 → 伏見 出口10 ¥\n步行 ～10分鐘', tags: ['地下鐵'], cost: '¥240', costUnit: 'YEN' }
+        ]
+      },
+      {
+        label: 'Day 6', shortDate: '7/3', color: '#c77b2e',
+        title: '🛍 大須商店街 → 回程',
+        subtitle: '7月3日（木）· 大須 → 金山 → 中部機場 · μticket',
+        stops: [
+          { time: '08:30–12:45', name: '🛍 酒店 → 大須商店街', detail: '步行至伏見站 ～10分鐘\n鶴舞線 赤池行き → 大須観音 ～2分鐘\n公用洗手間附近 locker / 2號出口 7-11寄存行李', tags: ['購物', '商店街'], cost: '¥630', costUnit: 'YEN' },
+          { time: '08:30–12:45', name: '🏮 大須商店街 探索', detail: '步行 ～9分鐘進商店街\n古著・電子・小吃・神社\n大須觀音', tags: ['商店街', '古著', '美食'] },
+          { time: '13:00', name: '🚇 大須 → 金山站', detail: '步行至大須観音站 ～2分鐘\n鶴舞線 豊田市行き → 上前津 ～1分鐘 ¥360\n名城線 金山方面 → 金山 ～3分鐘', tags: ['地下鐵'], cost: '¥360', costUnit: 'YEN' },
+          { time: '13:30頃', name: '✈️ 金山 → 中部國際空港 → 香港', detail: '名鉄常滑・空港線\nミュースカイ 中部国際空港行き\n→ 中部国際空港 ～20分鐘\nμticket 使用！\n¥1,360', tags: ['名鉄', 'μticket', '機場'], cost: '¥1,360', costUnit: 'YEN' }
+        ]
+      }
+    ];
+
+    let activeDay = 0;
+    let activeView = 'both';
+    let editMode = false;
+    let activeStop = null;
+    let tripTitle = '🇯🇵 名古屋・高山・上高地 28/6–3/7 2026';
+    let showingTodo = false;
+
+    const TODO_CATEGORIES = ['🧳 行李', '📄 文件', '🎫 訂票/預約', '💊 藥物/衛生', '💰 金錢', '📱 電子產品', '🛍 購物清單', '其他'];
+    let TODO_LIST = [
+      { text: '護照 (有效期 6 個月以上)', done: false, category: '📄 文件' },
+      { text: '機票確認 (UO690)', done: false, category: '🎫 訂票/預約' },
+      { text: '換日圓', done: false, category: '💰 金錢' },
+      { text: '奥飛騨套票', done: false, category: '🎫 訂票/預約' },
+      { text: '旅遊保險', done: false, category: '📄 文件' },
+      { text: '行動電源', done: false, category: '📱 電子產品' },
+      { text: '轉插頭 (日本 Type A)', done: false, category: '📱 電子產品' },
+      { text: '熊鈴 (上高地用)', done: false, category: '🧳 行李' },
+    ];
+
+    function parseMoneyValue(text, fallbackCurrency) {
+      if (!text || typeof text !== 'string') return null;
+      const trimmed = text.trim();
+      if (!trimmed) return null;
+
+      const explicitPatterns = [
+        { pattern: /(?:¥|￥|JPY|YEN|円)\s*([0-9][0-9,]*(?:\.\d+)?)/i, currency: 'YEN' },
+        { pattern: /(?:HKD|HK\$|HKS|USD|US\$|\$)\s*([0-9][0-9,]*(?:\.\d+)?)/i, currency: 'HKD' }
+      ];
+
+      for (const rule of explicitPatterns) {
+        const match = trimmed.match(rule.pattern);
+        if (match) {
+          return {
+            amount: parseFloat(match[1].replace(/,/g, '')),
+            currency: rule.currency
+          };
+        }
+      }
+
+      const fallbackMatch = trimmed.match(/([0-9][0-9,]*(?:\.\d+)?)/);
+      if (!fallbackMatch) return null;
+
+      const amount = parseFloat(fallbackMatch[1].replace(/,/g, ''));
+      if (fallbackCurrency === 'HKD' || fallbackCurrency === 'USD') {
+        return { amount, currency: 'HKD' };
+      }
+      return { amount, currency: 'YEN' };
+    }
+
+    function addMoneyToTotals(total, item, fallbackCurrency) {
+      const parsed = parseMoneyValue(item, fallbackCurrency);
+      if (!parsed) return total;
+      if (parsed.currency === 'HKD') {
+        total.hkd += parsed.amount;
+      } else {
+        total.yen += parsed.amount;
+      }
+      return total;
+    }
+
+    function getDayTotals(day) {
+      const totals = { yen: 0, hkd: 0 };
+      day.stops.forEach(stop => {
+        if (stop.expenses && stop.expenses.length) {
+          stop.expenses.forEach(item => {
+            addMoneyToTotals(totals, item.amount, stop.costUnit || 'YEN');
+          });
+        }
+        if (stop.routeLegs && stop.routeLegs.length) {
+          stop.routeLegs.forEach(leg => {
+            addMoneyToTotals(totals, leg.fee, 'YEN');
+          });
+        }
+      });
+      return totals;
+    }
+
+    function createBlankStop() {
+      return {
+        time: '',
+        name: 'New stop',
+        detail: '',
+        tags: [],
+        routeLink: '',
+        mapsLink: '',
+        todos: [],
+        expenses: []
+      };
+    }
+
+    function createBlankDay(index) {
+      return {
+        label: `Day ${index + 1}`,
+        shortDate: '',
+        color: '#4a7fa5',
+        title: `New Day ${index + 1}`,
+        subtitle: '',
+        stops: [createBlankStop()]
+      };
+    }
+
+    function buildTabs() {
+      const tabs = document.getElementById('dayTabs');
+      tabs.innerHTML = '';
+      DAYS.forEach((day, i) => {
+        const b = document.createElement('button');
+        b.className = 'day-btn' + (!showingTodo && i === activeDay ? ' active' : '');
+        b.textContent = `${day.label} · ${day.shortDate || ''}`.replace(/ · $/, '');
+        if (!showingTodo && i === activeDay) b.style.background = day.color;
+        b.onclick = () => selectDay(i);
+        tabs.appendChild(b);
+      });
+      const todoBtn = document.createElement('button');
+      todoBtn.className = 'day-btn' + (showingTodo ? ' active' : '');
+      todoBtn.textContent = '📋 準備清單';
+      if (showingTodo) todoBtn.style.background = '#6b5b95';
+      todoBtn.onclick = () => selectTodo();
+      tabs.appendChild(todoBtn);
+    }
+
+    function selectDay(i) {
+      showingTodo = false;
+      activeDay = Math.max(0, Math.min(i, DAYS.length - 1));
+      activeStop = null;
+      buildTabs();
+      renderPlan();
+      renderMapPanel();
+    }
+
+    function selectTodo() {
+      showingTodo = true;
+      activeStop = null;
+      buildTabs();
+      renderTodoPage();
+      document.getElementById('mapPanel').classList.add('gone');
+    }
+
+    function addDay() {
+      const insertAt = Math.min(activeDay + 1, DAYS.length);
+      const newDay = createBlankDay(DAYS.length);
+      DAYS.splice(insertAt, 0, newDay);
+      activeDay = insertAt;
+      saveAll();
+      buildTabs();
+      renderPlan();
+      renderMapPanel();
+    }
+
+    function removeDay() {
+      if (DAYS.length <= 1) return;
+      DAYS.splice(activeDay, 1);
+      activeDay = Math.max(0, Math.min(activeDay, DAYS.length - 1));
+      saveAll();
+      buildTabs();
+      renderPlan();
+      renderMapPanel();
+    }
+
+    function addStop() {
+      const day = DAYS[activeDay];
+      if (!day) return;
+      day.stops.push(createBlankStop());
+      activeStop = day.stops.length - 1;
+      saveAll();
+      renderPlan();
+      renderMapPanel();
+    }
+
+    function removeStop() {
+      const day = DAYS[activeDay];
+      if (!day || !day.stops.length) return;
+      const indexToRemove = activeStop !== null && activeStop < day.stops.length ? activeStop : day.stops.length - 1;
+      day.stops.splice(indexToRemove, 1);
+      if (!day.stops.length) {
+        day.stops.push(createBlankStop());
+      }
+      activeStop = null;
+      saveAll();
+      renderPlan();
+      renderMapPanel();
+    }
+
+    function renderTime(stop) {
+      const sep = stop.time.match(/[–\-]/);
+      if (!sep) return stop.departBold ? `<strong class="time-bold">${stop.time}</strong>` : stop.time;
+      const idx = stop.time.indexOf(sep[0]);
+      const depart = stop.time.slice(0, idx);
+      const arrival = stop.time.slice(idx + 1);
+      const d = stop.departBold ? `<strong class="time-bold">${depart}</strong>` : depart;
+      const a = stop.arrivalBold ? `<strong class="time-bold">${arrival}</strong>` : arrival;
+      return `${d}${sep[0]}${a}`;
+    }
+
+    function renderPlan() {
+      if (showingTodo) { renderTodoPage(); return; }
+      // restore day-plan elements hidden by todo page
+      document.getElementById('todoContainer').style.display = 'none';
+      document.getElementById('stopList').style.display = '';
+      document.getElementById('costBar').style.display = '';
+      document.querySelector('.edit-banner').style.display = '';
+      document.getElementById('planPanel').style.cssText = '';
+      document.querySelector('.schedule-action-group').style.display = '';
+      const day = DAYS[activeDay];
+      document.getElementById('tripTitleDisplay').textContent = tripTitle;
+      document.getElementById('tripTitleInput').value = tripTitle;
+      document.getElementById('tripTitleEditor').style.display = editMode ? 'block' : 'none';
+
+      document.getElementById('dayTitle').textContent = day.title;
+      document.getElementById('daySub').textContent = day.subtitle;
+      document.getElementById('dayTitleInput').value = day.title;
+      document.getElementById('daySubtitleInput').value = day.subtitle;
+      document.getElementById('dayHeaderEditor').style.display = editMode ? 'block' : 'none';
+
+      const list = document.getElementById('stopList');
+      list.innerHTML = '';
+
+      day.stops.forEach((stop, i) => {
+        const isLast = i === day.stops.length - 1;
+        const row = document.createElement('div');
+        row.className = 'stop' + (activeStop === i ? ' editing-active' : '');
+        row.innerHTML = `
+          <div class="stop-left">
+            <div class="stop-num" style="background:${day.color}">${i + 1}</div>
+            ${!isLast ? `<div class="stop-line" style="background:${day.color}"></div>` : ''}
+          </div>
+          <div class="stop-body">
+            <div class="stop-time">${renderTime(stop)}</div>
+            <div class="stop-head">
+              <div class="stop-name">${stop.name}</div>
+              ${getStopExpenseTotal(stop) ? `<span class="cost-badge expense-badge">${getStopExpenseTotal(stop)}</span>` : ''}
+            </div>
+            <div class="stop-detail">${stop.detail.replace(/\n/g, '<br>')}</div>
+            ${stop.routeLegs && stop.routeLegs.length ? `<div class="route-legs-display"><table class="route-legs-table"><tbody>${stop.routeLegs.map(leg => `<tr><td style="white-space:nowrap">${leg.time}</td><td>${leg.type}</td><td>${leg.stop}</td><td style="white-space:nowrap">${leg.duration || ''}</td><td class="leg-fee-cell">${leg.fee}</td></tr>`).join('')}</tbody></table></div>` : ''}
+            <div class="stop-meta">${stop.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+              ${stop.routeLink ? `<button class="route-btn" data-route-btn="true" type="button">Route</button>` : ''}
+            </div>
+            ${stop.todos && stop.todos.length ? `<div class="todo-list">${stop.todos.map(todo => `<div class="todo-item"><span>•</span><span><strong>${todo.label}</strong>${todo.fee ? ` · ${todo.fee}` : ''}</span></div>`).join('')}</div>` : ''}
+            ${stop.expenses && stop.expenses.length ? `<div class="expense-list">${stop.expenses.map(item => `<div class="expense-item"><span>💸</span><span class="expense-text"><strong>${item.label}</strong>${item.amount ? `<span class="expense-amount">${item.amount}</span>` : ''}</span></div>`).join('')}</div>` : ''}
+            <div class="edit-fields">
+              <div class="edit-row">
+                <div><label>時間</label><input type="text" data-field="time" value="${stop.time}"></div>
+                <div style="flex:0 0 auto; display:flex; flex-direction:column; gap:4px; justify-content:flex-end;">
+                  <label style="display:flex; align-items:center; gap:5px; cursor:pointer; white-space:nowrap;">
+                    <input type="checkbox" data-field="departBold" ${stop.departBold ? 'checked' : ''}>
+                    <span style="font-size:10px; color:#c0392b; font-weight:700;">出發 粗體</span>
+                  </label>
+                  <label style="display:flex; align-items:center; gap:5px; cursor:pointer; white-space:nowrap;">
+                    <input type="checkbox" data-field="arrivalBold" ${stop.arrivalBold ? 'checked' : ''}>
+                    <span style="font-size:10px; color:#c0392b; font-weight:700;">抵達 粗體</span>
+                  </label>
+                </div>
+              </div>
+              <div><label>名稱</label><input type="text" data-field="name" value="${stop.name}"></div>
+              <div><label>詳情</label><textarea data-field="detail">${stop.detail}</textarea></div>
+              <div><label>Label（每行一個 / 逗號分隔）</label><textarea data-field="tags" placeholder="巴士&#10;餐廳&#10;購物">${(stop.tags || []).join('\n')}</textarea></div>
+              <div><label>Route Link</label><input type="text" data-field="routeLink" value="${stop.routeLink || ''}" placeholder="https://..."></div>
+              <div>
+                <label>Google Maps 連結</label>
+                <div class="map-links-editor">${((stop.mapLinks && stop.mapLinks.length) ? stop.mapLinks : (stop.mapsLink ? [{ label: 'Maps', url: stop.mapsLink }] : [])).map(ml => `<div class="map-link-row"><input type="text" data-ml-field="label" value="${ml.label || ''}" placeholder="標籤"><input type="text" data-ml-field="url" value="${ml.url || ''}" placeholder="https://maps.google.com/..."><button class="leg-del-btn map-link-del" type="button">✕</button></div>`).join('')}</div>
+                <button class="map-link-add-btn leg-add-btn" type="button">＋ 新增地圖連結</button>
+              </div>
+              <div><label>Info Link</label><input type="text" data-field="infoLink" value="${stop.infoLink || ''}" placeholder="https://..."></div>
+              <div>
+                <label>路線明細</label>
+                <div class="route-legs-editor">${(stop.routeLegs || []).map(leg => `<div class="route-leg-row"><input type="text" data-leg-field="time" value="${leg.time || ''}" placeholder="時間"><textarea data-leg-field="type" placeholder="交通工具">${leg.type || ''}</textarea><textarea data-leg-field="stop" placeholder="站名">${leg.stop || ''}</textarea><input type="text" data-leg-field="duration" value="${leg.duration || ''}" placeholder="車程"><input type="text" data-leg-field="fee" value="${leg.fee || ''}" placeholder="費用"><button class="leg-del-btn" type="button">✕</button></div>`).join('')}</div>
+                <button class="leg-add-btn route-leg-add-btn" type="button">＋ 新增路線</button>
+              </div>
+              <div><label>To-do</label><textarea data-field="todos" placeholder="Task 1 · ¥100\nTask 2 · ¥200">${(stop.todos || []).map(todo => `${todo.label}${todo.fee ? ` · ${todo.fee}` : ''}`).join('\n')}</textarea></div>
+              <div><label>Spent Items</label><textarea data-field="expenses" placeholder="早餐: ¥50\n門票: ¥120">${(stop.expenses || []).map(item => `${item.label}: ${item.amount || ''}`).join('\n')}</textarea></div>
+              <button class="save-btn">Save ✓</button>
+            </div>
+          </div>
+        `;
+
+        const editor = row.querySelector('.edit-fields');
+        if (editor) {
+          editor.addEventListener('mousedown', e => e.stopPropagation());
+          editor.addEventListener('mouseup', e => e.stopPropagation());
+          editor.addEventListener('click', e => e.stopPropagation());
+          editor.addEventListener('focusin', e => {
+            if (e.target.matches && e.target.matches('input, textarea')) {
+              activeStop = i;
+            }
+          });
+          editor.querySelectorAll('input, textarea, button').forEach(el => {
+            el.addEventListener('mousedown', e => e.stopPropagation());
+            el.addEventListener('mouseup', e => e.stopPropagation());
+            el.addEventListener('click', e => e.stopPropagation());
+          });
+        }
+
+        row.style.cursor = (!editMode && !stop.infoLink) ? 'default' : 'pointer';
+
+        row.onclick = (e) => {
+          const target = e.target;
+          const clickedInsideEditor = target.closest && target.closest('.edit-fields, input, textarea, button, label');
+          if (!editMode) {
+            if (stop.infoLink) window.open(stop.infoLink, '_blank', 'noopener,noreferrer');
+          } else if (!clickedInsideEditor) {
+            activeStop = activeStop === i ? null : i;
+            renderPlan();
+          }
+        };
+
+        const routeBtn = row.querySelector('[data-route-btn="true"]');
+        if (routeBtn) {
+          routeBtn.onclick = (e) => {
+            e.stopPropagation();
+            const routeUrl = stop.routeLink;
+            if (routeUrl) {
+              window.open(routeUrl, '_blank', 'noopener,noreferrer');
+            }
+          };
+        }
+
+        row.querySelector('.save-btn').onclick = (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          activeStop = null;
+          row.classList.remove('editing-active');
+          const ef = row.querySelector('.edit-fields');
+          if (ef) ef.style.display = 'none';
+          const target = day.stops[i];
+          row.querySelectorAll('[data-field]').forEach(input => {
+            const field = input.dataset.field;
+            if (field === 'tags') {
+              target.tags = input.value
+                .split(/[\n,，]+/)
+                .map(tag => tag.trim())
+                .filter(Boolean);
+            } else if (field === 'todos') {
+              target.todos = input.value
+                .split('\n')
+                .map(line => line.trim())
+                .filter(Boolean)
+                .map(line => {
+                  const match = line.match(/^(.*?)(?:\s*·\s*([A-Za-z¥$€£][^\n]*))?$/);
+                  return {
+                    label: match ? match[1].trim() : line,
+                    fee: match && match[2] ? match[2].trim() : ''
+                  };
+                });
+            } else if (field === 'expenses') {
+              target.expenses = input.value
+                .split('\n')
+                .map(line => line.trim())
+                .filter(Boolean)
+                .map(line => {
+                  const parts = line.split(':');
+                  const label = parts.shift()?.trim() || '';
+                  const amount = parts.join(':').trim();
+                  return {
+                    label,
+                    amount
+                  };
+                });
+            } else if (field === 'departBold') {
+              target.departBold = input.checked;
+            } else if (field === 'arrivalBold') {
+              target.arrivalBold = input.checked;
+            } else {
+              target[field] = input.value;
+            }
+          });
+          const legsEditor = row.querySelector('.route-legs-editor');
+          if (legsEditor) {
+            const legRows = legsEditor.querySelectorAll('.route-leg-row');
+            target.routeLegs = Array.from(legRows).map(legRow => ({
+              time:     legRow.querySelector('[data-leg-field="time"]')?.value.trim() || '',
+              type:     legRow.querySelector('[data-leg-field="type"]')?.value.trim() || '',
+              stop:     legRow.querySelector('[data-leg-field="stop"]')?.value.trim() || '',
+              duration: legRow.querySelector('[data-leg-field="duration"]')?.value.trim() || '',
+              fee:      legRow.querySelector('[data-leg-field="fee"]')?.value.trim() || '',
+            })).filter(leg => leg.time || leg.type || leg.stop || leg.duration || leg.fee);
+          }
+          const mlEditor = row.querySelector('.map-links-editor');
+          if (mlEditor) {
+            const mlRows = mlEditor.querySelectorAll('.map-link-row');
+            target.mapLinks = Array.from(mlRows).map(mlRow => ({
+              label: mlRow.querySelector('[data-ml-field="label"]')?.value.trim() || '',
+              url:   mlRow.querySelector('[data-ml-field="url"]')?.value.trim() || '',
+            })).filter(ml => ml.url);
+          }
+          saveAll();
+          activeStop = null;
+          renderPlan();
+          renderMapPanel();
+        };
+
+        list.appendChild(row);
+
+        const legsEditor = row.querySelector('.route-legs-editor');
+        const legAddBtn = row.querySelector('.route-leg-add-btn');
+
+        function makeLegRow(leg = {}) {
+          const legRow = document.createElement('div');
+          legRow.className = 'route-leg-row';
+          legRow.innerHTML = `
+            <input type="text" data-leg-field="time" value="${leg.time || ''}" placeholder="時間">
+            <textarea data-leg-field="type" placeholder="交通工具">${leg.type || ''}</textarea>
+            <textarea data-leg-field="stop" placeholder="站名">${leg.stop || ''}</textarea>
+            <input type="text" data-leg-field="duration" value="${leg.duration || ''}" placeholder="車程">
+            <input type="text" data-leg-field="fee" value="${leg.fee || ''}" placeholder="費用">
+            <button class="leg-del-btn" type="button">✕</button>
+          `;
+          legRow.querySelectorAll('input, button').forEach(el => {
+            el.addEventListener('mousedown', e => e.stopPropagation());
+            el.addEventListener('click', e => e.stopPropagation());
+          });
+          legRow.querySelector('.leg-del-btn').onclick = (e) => {
+            e.stopPropagation();
+            legRow.remove();
+          };
+          return legRow;
+        }
+
+        if (legsEditor) {
+          legsEditor.querySelectorAll('.route-leg-row').forEach(legRow => {
+            legRow.querySelectorAll('input, button').forEach(el => {
+              el.addEventListener('mousedown', e => e.stopPropagation());
+              el.addEventListener('click', e => e.stopPropagation());
+            });
+            legRow.querySelector('.leg-del-btn').onclick = (e) => {
+              e.stopPropagation();
+              legRow.remove();
+            };
+          });
+        }
+
+        if (legAddBtn) {
+          legAddBtn.addEventListener('mousedown', e => e.stopPropagation());
+          legAddBtn.onclick = (e) => {
+            e.stopPropagation();
+            legsEditor.appendChild(makeLegRow());
+          };
+        }
+
+        const mlEditor = row.querySelector('.map-links-editor');
+        const mlAddBtn = row.querySelector('.map-link-add-btn');
+
+        function makeMapLinkRow(ml = {}) {
+          const mlRow = document.createElement('div');
+          mlRow.className = 'map-link-row';
+          mlRow.innerHTML = `
+            <input type="text" data-ml-field="label" value="${ml.label || ''}" placeholder="標籤">
+            <input type="text" data-ml-field="url" value="${ml.url || ''}" placeholder="https://maps.google.com/...">
+            <button class="leg-del-btn map-link-del" type="button">✕</button>
+          `;
+          mlRow.querySelectorAll('input, button').forEach(el => {
+            el.addEventListener('mousedown', e => e.stopPropagation());
+            el.addEventListener('click', e => e.stopPropagation());
+          });
+          mlRow.querySelector('.map-link-del').onclick = (e) => { e.stopPropagation(); mlRow.remove(); };
+          return mlRow;
+        }
+
+        if (mlEditor) {
+          mlEditor.querySelectorAll('.map-link-row').forEach(mlRow => {
+            mlRow.querySelectorAll('input, button').forEach(el => {
+              el.addEventListener('mousedown', e => e.stopPropagation());
+              el.addEventListener('click', e => e.stopPropagation());
+            });
+            mlRow.querySelector('.map-link-del').onclick = (e) => { e.stopPropagation(); mlRow.remove(); };
+          });
+        }
+
+        if (mlAddBtn) {
+          mlAddBtn.addEventListener('mousedown', e => e.stopPropagation());
+          mlAddBtn.onclick = (e) => { e.stopPropagation(); mlEditor.appendChild(makeMapLinkRow()); };
+        }
+
+        if (!isLast) {
+          const divider = document.createElement('div');
+          divider.className = 'transport-divider';
+          divider.textContent = '↓';
+          list.appendChild(divider);
+        }
+      });
+
+      const costBar = document.getElementById('costBar');
+      const totals = getDayTotals(day);
+      costBar.innerHTML = '';
+      const currencyParts = [];
+      if (totals.yen) currencyParts.push(`<span>¥${totals.yen.toLocaleString()}</span>`);
+      if (totals.hkd) currencyParts.push(`<span>$${totals.hkd.toLocaleString()}</span>`);
+      if (currencyParts.length) {
+        costBar.innerHTML = `今日消費: ${currencyParts.join(' | ')}`;
+      } else {
+        costBar.textContent = '今日費用另計';
+      }
+    }
+
+    function getStopExpenseTotal(stop) {
+      const totals = { yen: 0, hkd: 0 };
+      if (stop.expenses && stop.expenses.length) {
+        stop.expenses.forEach(item => addMoneyToTotals(totals, item.amount, stop.costUnit || 'YEN'));
+      }
+      if (stop.routeLegs && stop.routeLegs.length) {
+        stop.routeLegs.forEach(leg => addMoneyToTotals(totals, leg.fee, 'YEN'));
+      }
+      const parts = [];
+      if (totals.yen) parts.push(`¥${totals.yen.toLocaleString()}`);
+      if (totals.hkd) parts.push(`HKD ${totals.hkd.toLocaleString()}`);
+      return parts.length ? parts.join(' · ') : null;
+    }
+
+    function renderMapPanel() {
+      const day = DAYS[activeDay];
+      if (!day) return;
+      const dayTitleEl = document.getElementById('dayTitle');
+      const mapTitle = document.getElementById('mapTitle');
+      if (mapTitle) {
+        const visibleTitle = (dayTitleEl && dayTitleEl.textContent.trim()) || day.title || day.label;
+        const titleText = visibleTitle ? `${visibleTitle} — ${day.stops.length} stops` : `${day.label} — ${day.stops.length} stops`;
+        mapTitle.textContent = titleText;
+      }
+      const list = document.getElementById('mapStops');
+      if (!list) return;
+      list.innerHTML = '';
+      day.stops.forEach((stop, i) => {
+        const item = document.createElement('div');
+        item.className = 'map-stop-item';
+        item.innerHTML = `
+          <div class="map-stop-num" style="background:${day.color}">${i + 1}</div>
+          <div class="map-stop-info">
+            <div class="map-stop-name">${stop.name}</div>
+            <div class="map-stop-time">${stop.time}${stop.cost ? ' · ' + stop.cost : ''}</div>
+          </div>
+          <div class="map-stop-links">${
+            (stop.mapLinks && stop.mapLinks.length)
+              ? stop.mapLinks.map(ml => `<a class="map-link" href="${ml.url}" target="_blank">${ml.label || 'Maps'} ↗</a>`).join('')
+              : (stop.mapsLink ? `<a class="map-link" href="${stop.mapsLink}" target="_blank">Maps ↗</a>` : '')
+          }</div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function setView(view) {
+      activeView = view;
+      const plan = document.getElementById('planPanel');
+      const map = document.getElementById('mapPanel');
+      const activeBtn = document.querySelector(`[data-view="${view}"]`);
+
+      document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+      if (activeBtn) activeBtn.classList.add('active');
+
+      if (!plan || !map) return;
+
+      plan.classList.remove('gone', 'full');
+      map.classList.remove('gone');
+      plan.style.width = '';
+
+      if (view === 'both') {
+        plan.style.width = '52%';
+        plan.style.flex = '0 0 52%';
+        plan.classList.remove('full');
+      } else if (view === 'plan') {
+        plan.style.width = '100%';
+        plan.style.flex = '1 1 auto';
+        plan.classList.add('full');
+        map.classList.add('gone');
+      } else if (view === 'map') {
+        plan.style.width = '';
+        plan.style.flex = '0 0 0';
+        plan.classList.remove('full');
+        plan.classList.add('gone');
+        map.classList.remove('gone');
+      }
+    }
+
+    function toggleEdit() {
+      editMode = !editMode;
+      document.body.classList.toggle('editing', editMode);
+      const btn = document.getElementById('editToggle');
+      btn.classList.toggle('active', editMode);
+      btn.textContent = editMode ? '✓ 完成' : '✏️ Edit';
+      if (!editMode) {
+        const tripInput = document.getElementById('tripTitleInput');
+        if (tripInput && tripInput.value.trim()) tripTitle = tripInput.value.trim();
+
+        const dayTitleInput = document.getElementById('dayTitleInput');
+        const daySubtitleInput = document.getElementById('daySubtitleInput');
+        const currentDay = DAYS[activeDay];
+        if (currentDay) {
+          const nextTitle = dayTitleInput ? dayTitleInput.value.trim() : '';
+          const nextSubtitle = daySubtitleInput ? daySubtitleInput.value.trim() : '';
+          if (nextTitle) currentDay.title = nextTitle;
+          if (nextSubtitle) currentDay.subtitle = nextSubtitle;
+
+          const dayTitleEl = document.getElementById('dayTitle');
+          const daySubEl = document.getElementById('daySub');
+          if (dayTitleEl) dayTitleEl.textContent = currentDay.title;
+          if (daySubEl) daySubEl.textContent = currentDay.subtitle;
+        }
+
+        saveAll();
+        activeStop = null;
+        renderPlan();
+        renderMapPanel();
+        requestAnimationFrame(() => {
+          renderPlan();
+          renderMapPanel();
+          const mapTitleEl = document.getElementById('mapTitle');
+          const dayTitleEl = document.getElementById('dayTitle');
+          if (mapTitleEl && dayTitleEl && currentDay) {
+            mapTitleEl.textContent = `${dayTitleEl.textContent.trim()} — ${currentDay.stops.length} stops`;
+          }
+        });
+        requestAnimationFrame(() => {
+          renderPlan();
+          renderMapPanel();
+        });
+      } else {
+        renderPlan();
+      }
+    }
+
+    function renderTodoPage() {
+      if (!showingTodo) return;
+
+      // hide day-plan elements, show todo container
+      document.getElementById('dayTitle').textContent = '📋 出發前準備清單';
+      document.getElementById('daySub').textContent = '勾選已完成的事項';
+      document.getElementById('dayHeaderEditor').style.display = 'none';
+      document.querySelector('.edit-banner').style.display = 'none';
+      document.getElementById('stopList').style.display = 'none';
+      document.getElementById('costBar').style.display = 'none';
+      document.getElementById('mapPanel').classList.add('gone');
+      document.getElementById('planPanel').style.cssText = 'width:100%;flex:1 1 auto;';
+      document.querySelector('.schedule-action-group').style.display = 'none';
+
+      const container = document.getElementById('todoContainer');
+      container.style.display = 'block';
+
+      const done = TODO_LIST.filter(t => t.done).length;
+      const total = TODO_LIST.length;
+
+      const grouped = {};
+      TODO_CATEGORIES.forEach(c => { grouped[c] = []; });
+      TODO_LIST.forEach((item, idx) => {
+        if (!grouped[item.category]) grouped[item.category] = [];
+        grouped[item.category].push({ ...item, idx });
+      });
+
+      const catOptions = TODO_CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join('');
+
+      container.innerHTML = `
+        <div class="todo-page">
+          <div class="todo-progress">已完成 <span>${done} / ${total}</span> 項</div>
+          <div class="todo-add-row">
+            <input type="text" id="todoNewText" placeholder="新增事項..." />
+            <select id="todoNewCat">${catOptions}</select>
+            <button class="todo-add-btn" id="todoAddBtn">＋ 新增</button>
+          </div>
+          ${TODO_CATEGORIES.map(cat => {
+            const items = grouped[cat] || [];
+            if (!items.length) return '';
+            return `<div class="todo-category-group">
+              <div class="todo-category-label">${cat}</div>
+              ${items.map(item => `
+                <div class="todo-entry">
+                  <input type="checkbox" data-todo-idx="${item.idx}" ${item.done ? 'checked' : ''}>
+                  <span class="todo-entry-text${item.done ? ' done' : ''}">${item.text}</span>
+                  <button class="todo-del-btn" data-todo-del="${item.idx}">✕</button>
+                </div>
+              `).join('')}
+            </div>`;
+          }).join('')}
+        </div>
+      `;
+
+      container.querySelectorAll('[data-todo-idx]').forEach(cb => {
+        cb.onchange = () => {
+          TODO_LIST[+cb.dataset.todoIdx].done = cb.checked;
+          saveAll();
+          renderTodoPage();
+        };
+      });
+
+      container.querySelectorAll('[data-todo-del]').forEach(btn => {
+        btn.onclick = () => {
+          TODO_LIST.splice(+btn.dataset.todoDel, 1);
+          saveAll();
+          renderTodoPage();
+        };
+      });
+
+      const addBtn = document.getElementById('todoAddBtn');
+      const addInput = document.getElementById('todoNewText');
+      const addCat = document.getElementById('todoNewCat');
+      const doAdd = () => {
+        const text = addInput.value.trim();
+        if (!text) return;
+        TODO_LIST.push({ text, done: false, category: addCat.value });
+        addInput.value = '';
+        saveAll();
+        renderTodoPage();
+        document.getElementById('todoNewText').focus();
+      };
+      addBtn.onclick = doAdd;
+      addInput.onkeydown = e => { if (e.key === 'Enter') doAdd(); };
+    }
+
+    function saveAll() {
+      localStorage.setItem('trip-planner-template', JSON.stringify({ tripTitle, DAYS, TODO_LIST }));
+    }
+
+    function loadSaved() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('trip-planner-template') || 'null');
+        if (saved && Array.isArray(saved.DAYS)) {
+          saved.DAYS.forEach((day, i) => {
+            if (DAYS[i]) {
+              DAYS[i] = { ...DAYS[i], ...day };
+              if (Array.isArray(day.stops)) DAYS[i].stops = day.stops;
+            }
+          });
+          if (saved.tripTitle) tripTitle = saved.tripTitle;
+          if (Array.isArray(saved.TODO_LIST)) TODO_LIST = saved.TODO_LIST;
+        } else if (Array.isArray(saved)) {
+          saved.forEach((day, i) => {
+            if (DAYS[i]) {
+              DAYS[i].stops = day.stops || DAYS[i].stops;
+            }
+          });
+        }
+      } catch (e) {}
+    }
+
+    document.querySelectorAll('.view-btn').forEach(btn => {
+      btn.onclick = () => setView(btn.dataset.view);
+    });
+
+    document.getElementById('addDayBtn').onclick = addDay;
+    document.getElementById('removeDayBtn').onclick = removeDay;
+    document.getElementById('addStopBtn').onclick = addStop;
+    document.getElementById('removeStopBtn').onclick = removeStop;
+    document.getElementById('editToggle').onclick = toggleEdit;
+    document.getElementById('routeButton').onclick = () => {
+      const day = DAYS[activeDay];
+      const valid = day.stops.filter(s => s.lat && s.lng);
+      if (!valid.length) return;
+      const origin = `${valid[0].lat},${valid[0].lng}`;
+      const destination = `${valid[valid.length - 1].lat},${valid[valid.length - 1].lng}`;
+      const waypoints = valid.slice(1, -1).map(s => `${s.lat},${s.lng}`).join('|');
+      let url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}`;
+      if (waypoints) url += `&waypoints=${encodeURIComponent(waypoints)}`;
+      window.open(url, '_blank');
+    };
+
+    loadSaved();
+    buildTabs();
+    renderPlan();
+    renderMapPanel();
+  </script>
+
+
+<div id="viewport-size-display" style="opacity: 0; display: none;">1440px x 778px</div><grammarly-desktop-integration data-grammarly-shadow-root="true" style="visibility: visible !important;"><template shadowrootmode="open"><style>
+      div.grammarly-desktop-integration {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select:none;
+        user-select:none;
+      }
+
+      div.grammarly-desktop-integration:before {
+        content: attr(data-content);
+      }
+    </style><div aria-label="grammarly-integration" role="group" tabindex="-1" class="grammarly-desktop-integration" data-content="{&quot;mode&quot;:&quot;full&quot;,&quot;isActive&quot;:true,&quot;isUserDisabled&quot;:false}"></div></template></grammarly-desktop-integration></body></html>
