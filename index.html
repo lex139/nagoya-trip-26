@@ -962,6 +962,7 @@ Task 2 · ¥200"></textarea></div>
 
 <script>
 
+    //<<MUTABLE_DATA_START>>
     const DAYS = [
       {
         "label": "Day 1",
@@ -1766,7 +1767,6 @@ Task 2 · ¥200"></textarea></div>
       }
     ];
 
-    //<<MUTABLE_DATA_START>>
     let activeDay = 0;
     let activeView = 'both';
     let editMode = false;
@@ -2552,6 +2552,8 @@ Task 2 · ¥200"></textarea></div>
       if (!script) return alert('Export marker not found.');
 
       const newDataBlock = `//<<MUTABLE_DATA_START>>
+    const DAYS = ${JSON.stringify(DAYS, null, 2).replace(/\n/g, '\n    ')};
+
     let activeDay = 0;
     let activeView = 'both';
     let editMode = false;
@@ -2563,11 +2565,8 @@ Task 2 · ¥200"></textarea></div>
     let TODO_LIST = ${JSON.stringify(TODO_LIST, null, 2).replace(/\n/g, '\n    ')};
     //<<MUTABLE_DATA_END>>`;
 
-      const newDaysBlock = `const DAYS = ${JSON.stringify(DAYS, null, 2).replace(/\n/g, '\n    ')};`;
-
       let src = script.textContent;
-      src = src.replace(/\/\/<<MUTABLE_DATA_START>>[\s\S]*?\/\/<<MUTABLE_DATA_END>>/, newDataBlock);
-      src = src.replace(/const DAYS = \[[\s\S]*?\];\n/, newDaysBlock + '\n');
+      src = src.replace(/\/\/<<MUTABLE_DATA_START>>[\s\S]*?\/\/<<MUTABLE_DATA_END>>/, () => newDataBlock);
 
       // Assemble clean HTML
       const styleHTML = document.querySelector('style') ? '<style>' + document.querySelector('style').textContent + '</style>' : '';
