@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- saved from url=(0050)file:///Volumes/BOOTCAMP/Nagoya%20Trip%202026.html -->
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -716,6 +715,7 @@
         <button class="view-btn" data-view="map">⊙ Map</button>
       </div>
       <button class="edit-toggle-btn" id="editToggle">✏️ Edit</button>
+      <button class="edit-toggle-btn" id="exportBtn" title="Export HTML with current data">⬇ Export</button>
     </div>
   </div>
 
@@ -1032,6 +1032,7 @@ Task 2 · ¥200"></textarea></div>
       }
     ];
 
+    //<<MUTABLE_DATA_START>>
     let activeDay = 0;
     let activeView = 'both';
     let editMode = false;
@@ -1050,6 +1051,7 @@ Task 2 · ¥200"></textarea></div>
       { text: '轉插頭 (日本 Type A)', done: false, category: '📱 電子產品' },
       { text: '熊鈴 (上高地用)', done: false, category: '🧳 行李' },
     ];
+    //<<MUTABLE_DATA_END>>
 
     function parseMoneyValue(text, fallbackCurrency) {
       if (!text || typeof text !== 'string') return null;
@@ -1784,31 +1786,28 @@ Task 2 · ¥200"></textarea></div>
       window.open(url, '_blank');
     };
 
-    loadSaved();
-    buildTabs();
-    renderPlan();
-    renderMapPanel();
-  </script>
+    function exportHTML() {
+      const script = Array.from(document.querySelectorAll('script:not([src])')).find(s => s.textContent.includes('<<MUTABLE_DATA_START>>'));
+      if (!script) return alert('Export marker not found.');
 
+      const newDataBlock = `//<<MUTABLE_DATA_START>>
+    let activeDay = 0;
+    let activeView = 'both';
+    let editMode = false;
+    let activeStop = null;
+    let tripTitle = ${JSON.stringify(tripTitle)};
+    let showingTodo = false;
 
-<div id="viewport-size-display" style="opacity: 0; display: none;">1440px x 778px</div><grammarly-desktop-integration data-grammarly-shadow-root="true" style="visibility: visible !important;"><template shadowrootmode="open"><style>
-      div.grammarly-desktop-integration {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border: 0;
-        -moz-user-select: none;
-        -webkit-user-select: none;
-        -ms-user-select:none;
-        user-select:none;
-      }
+    const TODO_CATEGORIES = ${JSON.stringify(TODO_CATEGORIES)};
+    let TODO_LIST = ${JSON.stringify(TODO_LIST, null, 2).replace(/\n/g, '\n    ')};
+    //<<MUTABLE_DATA_END>>`;
 
-      div.grammarly-desktop-integration:before {
-        content: attr(data-content);
-      }
-    </style><div aria-label="grammarly-integration" role="group" tabindex="-1" class="grammarly-desktop-integration" data-content="{&quot;mode&quot;:&quot;full&quot;,&quot;isActive&quot;:true,&quot;isUserDisabled&quot;:false}"></div></template></grammarly-desktop-integration></body></html>
+      const newDaysBlock = `const DAYS = ${JSON.stringify(DAYS, null, 2).replace(/\n/g, '\n    ')};`;
+
+      let src = script.textContent;
+      src = src.replace(/\/\/<<MUTABLE_DATA_START>>[\s\S]*?\/\/<<MUTABLE_DATA_END>>/, newDataBlock);
+      src = src.replace(/const DAYS = \[[\s\S]*?\];\n/, newDaysBlock + '\n');
+
+      // Build clean HTML: use outerHTML but strip browser-injected elements
+      let html = document.documentElement.outerHTML;
+      html = html.replace(/</body></html>
