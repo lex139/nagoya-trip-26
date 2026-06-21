@@ -169,6 +169,11 @@
       border-radius: 8px;
     }
 
+    .edit-toggle-btn:disabled {
+      opacity: .3;
+      cursor: default;
+    }
+
     .main {
       display: flex;
       flex: 1;
@@ -714,6 +719,8 @@
         <button class="view-btn" data-view="plan">≡ Plan</button>
         <button class="view-btn" data-view="map">⊙ Map</button>
       </div>
+      <button class="edit-toggle-btn" id="undoBtn" title="Undo (Cmd+Z)" disabled>↶ Undo</button>
+      <button class="edit-toggle-btn" id="redoBtn" title="Redo (Cmd+Shift+Z)" disabled>↷ Redo</button>
       <button class="edit-toggle-btn" id="editToggle">✏️ Edit</button>
       <button class="edit-toggle-btn" id="exportBtn" title="Export HTML with current data">⬇ Export</button>
       <span id="syncStatus" title="Cloud sync status" style="font-size:12px;padding:4px 8px;border-radius:8px;background:#eee;color:#777;white-space:nowrap;">☁ —</span>
@@ -963,7 +970,7 @@ Task 2 · ¥200"></textarea></div>
         "label": "Day 1",
         "shortDate": "6/28",
         "color": "#c0392b",
-        "title": "名古屋 → 高山 ✈️",
+        "title": "名古屋機場 → 高山",
         "subtitle": "6月28日（日）· 中部機場入境 · 名鉄 + JR 特急ひだ → 高山",
         "stops": [
           {
@@ -974,51 +981,72 @@ Task 2 · ¥200"></textarea></div>
               "航班"
             ],
             "cost": "HKD 6,453",
-            "costUnit": "HKD"
+            "costUnit": "HKD",
+            "departBold": true,
+            "arrivalBold": false,
+            "routeLink": "",
+            "infoLink": "",
+            "todos": [],
+            "expenses": [],
+            "routeLegs": [],
+            "mapLinks": []
           },
           {
             "time": "17:30–18:30",
             "name": "🍽 晚餐 — 中部機場",
             "detail": "T1 4樓 / T2 2樓餐廳\n順便寄存行李（交通廣場2樓，24hrs）",
-            "tags": [
-              "餐廳"
-            ]
+            "tags": [],
+            "departBold": false,
+            "arrivalBold": true,
+            "routeLink": "",
+            "infoLink": "https://www.centrair.jp/tzh/shop-dine/restaurant/index.html",
+            "todos": [],
+            "expenses": [],
+            "routeLegs": [],
+            "mapLinks": []
           },
           {
-            "time": "19:17発",
-            "name": "🚃 名鉄常滑・空港線特急",
-            "detail": "名鉄岐阜行き → 名鉄名古屋\n～38分鐘",
+            "time": "18:45-23:00",
+            "name": "🚄 中部機場 → 高山酒店",
+            "detail": "JR名古屋站取票 (Klook)",
             "tags": [
-              "電車",
-              "名鉄"
-            ]
-          },
-          {
-            "time": "20:10発",
-            "name": "🚃 名鉄名古屋本線特急",
-            "detail": "名鉄岐阜行き → 名鉄一宮\n～15分鐘 → 步行至尾張一宮（JR）～6分鐘",
-            "tags": [
-              "電車",
-              "名鉄"
-            ]
-          },
-          {
-            "time": "20:29発",
-            "name": "🚃 JR東海道本線 特急ひだ19号",
-            "detail": "高山行き → 高山\n～2小時20分鐘",
-            "tags": [
-              "JR",
-              "特急"
+              "myuSky",
+              "ＪＲ東海道本線特急ひだ19号"
             ],
-            "cost": "¥17,820",
-            "costUnit": "YEN"
-          },
-          {
-            "time": "23:00頃",
-            "name": "🏨 抵達・Check-in 高山酒店",
-            "detail": "📍步行 1分鐘\n奥飛騨套票 ¥7,700/人",
-            "tags": [
-              "酒店"
+            "departBold": true,
+            "arrivalBold": false,
+            "routeLink": "https://trainbus.meitetsu.co.jp/meitetsu-transfer-zh-tw/smart/extif/SearchTransferFromNtjStopIdIF?&startId=00009406&goalId=00004372&date=202606281900&basis=1&sort=0",
+            "infoLink": "https://touristpass.jp/assets/pdf/route_timetable/tt_alpine.pdf",
+            "todos": [],
+            "expenses": [],
+            "routeLegs": [
+              {
+                "time": "19:07-19:36",
+                "type": "ミュースカイ 全車特別車",
+                "stop": "名鉄名古屋",
+                "duration": "29分鐘",
+                "fee": "2860"
+              },
+              {
+                "time": "",
+                "type": "🚶",
+                "stop": "JR名古屋",
+                "duration": "",
+                "fee": ""
+              },
+              {
+                "time": "20:17-22:49",
+                "type": "ＪＲ東海道本線特急ひだ19号 高山行き",
+                "stop": "高山",
+                "duration": "2小時32分",
+                "fee": "$605"
+              }
+            ],
+            "mapLinks": [
+              {
+                "label": "高山酒店",
+                "url": "https://maps.app.goo.gl/KrCTz3jGBt1E1TAi7?g_st=ic"
+              }
             ]
           }
         ]
@@ -1031,51 +1059,200 @@ Task 2 · ¥200"></textarea></div>
         "subtitle": "6月29日（月）· 濃飛巴士 → 新穗高 · 纜車 · 飛驒牛燒肉",
         "stops": [
           {
-            "time": "07:34–09:17",
-            "name": "🚌 高山酒店 → 新穗高溫泉站",
-            "detail": "步行至高山濃飛巴士中心（～3分鐘）\n09:34発 濃飛巴士 平湯・新穂高線\n→ 新穗高ロープウェイ ～1小時43分鐘",
+            "time": "7:45-10:17",
+            "name": "🍽️酒店早餐・ 🚌 酒店 → 新穗高溫泉站",
+            "detail": "步行至高山濃飛巴士中心（～3分鐘）",
             "tags": [
-              "巴士",
-              "濃飛"
+              "早餐",
+              "巴士"
             ],
             "cost": "¥23,100",
-            "costUnit": "YEN"
+            "costUnit": "YEN",
+            "departBold": true,
+            "arrivalBold": false,
+            "routeLink": "2026/6/29(月) 高山濃飛バスセンター⇒新穂高温泉〔新穂高ロープウェイ〕 08:40⇒10:17 ------------------------------ 所要時間：1時間37分 運賃：2,200円 乗換：なし ------------------------------  ▽8:40発【高山濃飛バスセンター】 ｜ ｜　濃飛バス 平湯・新穂高線 ｜　５番のりば ｜　松之木農協前方面 ｜　新穂高ロープウェイ行 ｜　(当駅始発) ▼9:23着《直通》【ほおのき平】 ▽9:23発 ｜ ｜　濃飛バス [予約制]平湯・新穂高線 ｜　平湯温泉方面 ｜　新穂高ロープウェイ行 ▼9:23着《直通》【久手高原】 ▽9:23発 ｜ ｜　濃飛バス 平湯・新穂高線 ｜　平湯温泉方面 ｜　新穂高ロープウェイ行 ▼10:08着《直通》【国立公園口】 ▽10:08発 ｜ ｜　濃飛バス [予約制]平湯・新穂高線 ｜　新穂高ロープウェイ方面 ｜　新穂高ロープウェイ行 ▼10:16着【新穂高ロープウェイ】 ｜ ｜○徒歩　(30m) ｜ ▽10:17着【新穂高温泉〔新穂高ロープウェイ〕】   2026/6/21(日)現在の情報  【NAVITIMEアプリでルートを確認】 https://navitimeapp.go.link/95Mbm",
+            "infoLink": "",
+            "todos": [],
+            "expenses": [],
+            "routeLegs": [
+              {
+                "time": "不用預約 08:40-10:17",
+                "type": "濃飛巴士 平湯・新穂高線\n新穂高ロープウェイ行き",
+                "stop": "新穂高温泉〔新穂高ロープウェイ〕",
+                "duration": "1小時37分鐘",
+                "fee": ""
+              }
+            ],
+            "mapLinks": [
+              {
+                "label": "高山濃飛巴士中心",
+                "url": "https://maps.app.goo.gl/pkNJ3C1Xf8UuvPd1A"
+              }
+            ]
           },
           {
-            "time": "09:20–11:00",
+            "time": "10:20-11:00",
             "name": "🚠 新穗高纜車",
-            "detail": "分兩段全程 ～25分鐘\n奥飛騨套票使用 · 坐回程纜車下山",
+            "detail": "分兩段全程 ～25分鐘\n11:00坐回程纜車下山",
             "tags": [
-              "纜車",
-              "奥飛騨套票"
+              "纜車"
             ],
-            "cost": "套票"
+            "cost": "套票",
+            "departBold": false,
+            "arrivalBold": true,
+            "routeLink": "",
+            "infoLink": "",
+            "todos": [],
+            "expenses": [],
+            "routeLegs": [],
+            "mapLinks": []
           },
           {
             "time": "11:53–13:36",
             "name": "🚌 新穗高溫泉站 → 高山",
-            "detail": "11:53発 濃飛巴士\n→ 高山濃飛バスセンター ～1小時52分鐘",
+            "detail": "",
             "tags": [
-              "巴士",
-              "濃飛"
-            ]
+              "巴士"
+            ],
+            "departBold": true,
+            "arrivalBold": false,
+            "routeLink": "2026/6/29(月) 新穂高温泉〔新穂高ロープウェイ〕⇒高山濃飛バスセンター 11:53⇒13:31 ------------------------------ 所要時間：1時間38分 運賃：2,200円 乗換：なし ------------------------------  ▽11:53発【新穂高温泉〔新穂高ロープウェイ〕】 ｜ ｜○徒歩　(30m) ｜ ▼11:55着【新穂高ロープウェイ】 ▽11:55発 ｜ ｜　濃飛バス 平湯・新穂高線 ｜　山のホテル前方面 ｜　高山濃飛バスセンター行 ｜　(当駅始発) ▽13:31着【高山濃飛バスセンター】   2026/6/21(日)現在の情報  【NAVITIMEアプリでルートを確認】 https://navitimeapp.go.link/977SS",
+            "infoLink": "",
+            "todos": [],
+            "expenses": [],
+            "routeLegs": [
+              {
+                "time": "11:53-13:36",
+                "type": "濃飛バス　平湯・新穂高線",
+                "stop": "高山濃飛バスセンター",
+                "duration": "1小時38分",
+                "fee": ""
+              }
+            ],
+            "mapLinks": []
           },
           {
-            "time": "14:00–16:00",
+            "time": "14:00–16:15",
             "name": "🏮 高山老街 — 上三之町",
-            "detail": "こって牛 飛驒牛握壽司\n舩坂酒造店",
+            "detail": "由高山濃飛巴士站步行～10分鐘\n\n～16:15 去丸明攞晚餐飛",
             "tags": [
               "老街",
-              "美食"
+              "🥩こって牛 飛驒牛握壽司",
+              "🍸舩坂酒造店"
+            ],
+            "departBold": false,
+            "arrivalBold": true,
+            "routeLink": "",
+            "infoLink": "",
+            "todos": [],
+            "expenses": [],
+            "routeLegs": [],
+            "mapLinks": [
+              {
+                "label": "上三之町",
+                "url": "https://maps.app.goo.gl/yQW6TWH6e28LCjS28?g_st=ic"
+              },
+              {
+                "label": "こって牛",
+                "url": "https://maps.app.goo.gl/xMxBzN9rX67vqhJm8?g_st=ic"
+              },
+              {
+                "label": "舩坂酒造店",
+                "url": "https://maps.app.goo.gl/mQjb2d9YLF6VgyeS6?g_st=ic"
+              },
+              {
+                "label": "丸明",
+                "url": "https://maps.app.goo.gl/jw1wTBYXeYqJAJ3h8?g_st=ic"
+              }
             ]
           },
           {
-            "time": "18:00–19:00",
-            "name": "🥩 晚餐 — 飛驒牛燒肉 丸明",
-            "detail": "高山最有名飛驒牛燒肉！",
+            "time": "16:30-17:50",
+            "name": "周圍行",
+            "detail": "",
             "tags": [
-              "燒肉",
-              "晚餐"
+              "古着店📍ジャングルメイガン",
+              "水果大福📍稲豊園"
+            ],
+            "routeLink": "",
+            "mapsLink": "",
+            "todos": [],
+            "expenses": [],
+            "departBold": false,
+            "arrivalBold": true,
+            "infoLink": "",
+            "routeLegs": [],
+            "mapLinks": [
+              {
+                "label": "古着店",
+                "url": "https://maps.app.goo.gl/WNNs1s6nzFyi5E9q9?g_st=ic"
+              },
+              {
+                "label": "水果大福",
+                "url": "https://maps.app.goo.gl/ZFDH6irxRRfDGT1r9?g_st=ic"
+              }
+            ]
+          },
+          {
+            "time": "18:00-19:00",
+            "name": "🥩晚餐 — 飛驒牛燒肉 丸明",
+            "detail": "",
+            "tags": [],
+            "routeLink": "",
+            "mapsLink": "",
+            "todos": [],
+            "expenses": [],
+            "departBold": false,
+            "arrivalBold": false,
+            "infoLink": "",
+            "routeLegs": [],
+            "mapLinks": [
+              {
+                "label": "丸明",
+                "url": "https://maps.app.goo.gl/jw1wTBYXeYqJAJ3h8?g_st=ic"
+              }
+            ]
+          },
+          {
+            "time": "19:00-20:00",
+            "name": "🛒超市",
+            "detail": "",
+            "tags": [
+              "📍Family Store Satoh"
+            ],
+            "routeLink": "",
+            "mapsLink": "",
+            "todos": [],
+            "expenses": [],
+            "departBold": false,
+            "arrivalBold": false,
+            "infoLink": "",
+            "routeLegs": [],
+            "mapLinks": [
+              {
+                "label": "Family Store Satoh",
+                "url": "https://maps.app.goo.gl/BBWGQUrdpy3spVHU7?g_st=ic"
+              }
+            ]
+          },
+          {
+            "time": "20:00",
+            "name": "返酒店",
+            "detail": "",
+            "tags": [],
+            "routeLink": "",
+            "mapsLink": "",
+            "todos": [],
+            "expenses": [],
+            "departBold": false,
+            "arrivalBold": false,
+            "infoLink": "",
+            "routeLegs": [],
+            "mapLinks": [
+              {
+                "label": "高山酒店",
+                "url": "https://maps.app.goo.gl/NyWELMdjvDzE59d66?g_st=ic"
+              }
             ]
           }
         ]
@@ -1088,52 +1265,194 @@ Task 2 · ¥200"></textarea></div>
         "subtitle": "6月30日（火）· 高山 → 平湯温泉 → 大正池 → 河童橋 → 明神池",
         "stops": [
           {
-            "time": "08:15–09:38",
-            "name": "🚌 高山酒店 → 平湯温泉站",
-            "detail": "步行至高山濃飛巴士中心（～3分鐘）\n08:40発 平湯・新穂高線\n→ 平湯温泉 ～58分鐘（不用預約）",
-            "tags": [
-              "巴士",
-              "濃飛"
-            ]
-          },
-          {
-            "time": "10:00–10:20",
-            "name": "🚌 平湯温泉 → 大正池站",
-            "detail": "00分・30分発 上高地線\n→ 大正池 ～16分鐘（不用預約）\n買熊鈴🔔",
-            "tags": [
-              "巴士",
-              "上高地"
-            ],
-            "cost": "¥8,400",
-            "costUnit": "YEN"
-          },
-          {
-            "time": "10:30–11:45",
-            "name": "🚶 大正池 → 田代池 → 田代橋 → 河童橋",
-            "detail": "步行 ～1小時\n上午路線：大正池巴士站→田代池→田代橋→河童橋（約1h）",
-            "tags": [
-              "健行",
-              "免費"
-            ],
-            "cost": "Free"
-          },
-          {
-            "time": "12:30–13:45",
-            "name": "🚶 河童橋 → 梓川右岸 → 明神池",
-            "detail": "步行 ～1小時\n下午路線：河童橋→梓川右岸→明神池",
-            "tags": [
-              "健行",
-              "免費"
-            ],
-            "cost": "Free"
-          },
-          {
-            "time": "16:00–16:30",
-            "name": "🚌 上高地 → 平湯温泉",
-            "detail": "00分・30分発\n→ 平湯温泉 ～25分鐘\n尾班車 17:30",
+            "time": "07:45–09:38",
+            "name": "🍽️ 酒店早餐・🚌 高山酒店 → 大正池站",
+            "detail": "步行至高山濃飛巴士中心（～3分鐘）\n買熊鈴🔔",
             "tags": [
               "巴士"
+            ],
+            "departBold": true,
+            "arrivalBold": false,
+            "routeLink": "https://www.navitime.co.jp/bustransit/search?orvStationName=%E9%AB%98%E5%B1%B1%E6%BF%83%E9%A3%9B%E3%83%90%E3%82%B9%E3%82%BB%E3%83%B3%E3%82%BF%E3%83%BC&orvStationCode=00026125&dnvStationName=%E5%B9%B3%E6%B9%AF%E6%B8%A9%E6%B3%89&dnvStationCode=00082750&year=2026&month=6&day=30&hour=8&minute=20&basis=1&sort=0&wspeed=standard&unuse=",
+            "infoLink": "https://www-nouhibus-co-jp.translate.goog/route_bus/kamikochi-line-en/?_x_tr_sl=en&_x_tr_tl=zh-TW&_x_tr_hl=zh-TW#timetable",
+            "todos": [],
+            "expenses": [],
+            "routeLegs": [
+              {
+                "time": "不用預約 08:40",
+                "type": "平湯・新穂高線 新穂高ロープウェイ 行き",
+                "stop": "平湯温泉",
+                "duration": "58分鐘",
+                "fee": ""
+              },
+              {
+                "time": "不用預約 00分、30分発",
+                "type": "上高地線 上高地バスターミナル 行き",
+                "stop": "大正池",
+                "duration": "16分鐘",
+                "fee": "8400"
+              }
+            ],
+            "mapLinks": [
+              {
+                "label": "高山濃飛巴士中心",
+                "url": "https://maps.app.goo.gl/AMXeskaervB9ntVb7"
+              }
             ]
+          },
+          {
+            "time": "10:00-10:20",
+            "name": "🚶 大正池 → 田代池 → 田代橋 → 河童橋",
+            "detail": "步行 ～1小時",
+            "tags": [
+              "健行"
+            ],
+            "cost": "Free",
+            "departBold": true,
+            "arrivalBold": false,
+            "routeLink": "",
+            "infoLink": "",
+            "todos": [],
+            "expenses": [],
+            "routeLegs": [],
+            "mapLinks": [
+              {
+                "label": "上午路線",
+                "url": "https://maps.app.goo.gl/eAeLgsXZWwyPhwhHA"
+              }
+            ]
+          },
+          {
+            "time": "11:50-12:15",
+            "name": "休息",
+            "detail": "",
+            "tags": [
+              "📍Trois Cinq 蘋果批"
+            ],
+            "routeLink": "",
+            "mapsLink": "",
+            "todos": [],
+            "expenses": [],
+            "departBold": true,
+            "arrivalBold": true,
+            "infoLink": "",
+            "routeLegs": [],
+            "mapLinks": [
+              {
+                "label": "蘋果批",
+                "url": "https://maps.app.goo.gl/QRqfUe3Xc258Vch97"
+              }
+            ]
+          },
+          {
+            "time": "12:30-13:45",
+            "name": "🚶 河童橋 → 梓川右岸 → 明神池",
+            "detail": "步行 ～1小時",
+            "tags": [
+              "健行"
+            ],
+            "routeLink": "",
+            "mapsLink": "",
+            "todos": [],
+            "expenses": [],
+            "departBold": false,
+            "arrivalBold": true,
+            "infoLink": "",
+            "routeLegs": [],
+            "mapLinks": [
+              {
+                "label": "下午路線",
+                "url": "https://maps.app.goo.gl/p8mdr2jF5GZU1xWVA"
+              }
+            ]
+          },
+          {
+            "time": "13:45-14:30",
+            "name": "🍽️ 午餐 — 嘉門次小屋",
+            "detail": "",
+            "tags": [
+              "烤魚",
+              "蕎麥麵"
+            ],
+            "routeLink": "",
+            "mapsLink": "",
+            "todos": [],
+            "expenses": [],
+            "departBold": false,
+            "arrivalBold": true,
+            "infoLink": "",
+            "routeLegs": [],
+            "mapLinks": [
+              {
+                "label": "嘉門次小屋",
+                "url": "https://maps.app.goo.gl/JHQSpWT14AHBeGEh7"
+              }
+            ]
+          },
+          {
+            "time": "14:45-15:45",
+            "name": "🚶 明神池 → 梓川左岸 → 上高地巴士站",
+            "detail": "步行 ～1小時",
+            "tags": [],
+            "routeLink": "",
+            "mapsLink": "",
+            "todos": [],
+            "expenses": [],
+            "departBold": false,
+            "arrivalBold": true,
+            "infoLink": "",
+            "routeLegs": [],
+            "mapLinks": [
+              {
+                "label": "回程路線",
+                "url": "https://maps.app.goo.gl/sosVDpqG37E4xCWx6"
+              }
+            ]
+          },
+          {
+            "time": "16:00-17:35",
+            "name": "🚌 上高地巴士站 → 高山濃飛巴士中心",
+            "detail": "",
+            "tags": [],
+            "routeLink": "",
+            "mapsLink": "",
+            "todos": [],
+            "expenses": [],
+            "departBold": true,
+            "arrivalBold": false,
+            "infoLink": "",
+            "routeLegs": [
+              {
+                "time": "不用預約 00分、30分発",
+                "type": "上高地線 あかんだな駐車場行き",
+                "stop": "平湯温泉",
+                "duration": "25分鐘",
+                "fee": ""
+              },
+              {
+                "time": "不用預約 00分、30分発 尾班車17:30",
+                "type": "平湯・新穂高線  高山濃飛バスセンター 行き",
+                "stop": "高山濃飛バスセンター",
+                "duration": "1小時",
+                "fee": ""
+              }
+            ],
+            "mapLinks": []
+          },
+          {
+            "time": "18:00-19:00",
+            "name": "晚餐",
+            "detail": "",
+            "tags": [],
+            "routeLink": "",
+            "mapsLink": "",
+            "todos": [],
+            "expenses": [],
+            "departBold": false,
+            "arrivalBold": false,
+            "infoLink": "",
+            "routeLegs": [],
+            "mapLinks": []
           }
         ]
       },
@@ -1146,25 +1465,53 @@ Task 2 · ¥200"></textarea></div>
         "stops": [
           {
             "time": "09:00–12:30",
-            "name": "🚃 高山酒店 → 名古屋站",
-            "detail": "步行至高山駅 ～1分鐘\n09:36発 JR高山本線 特急ひだ6号 名古屋行き\n→ 名古屋 桜通り口 ～2小時28分鐘",
+            "name": "🍽️ 酒店早餐・🚄 高山 → 名古屋酒店",
+            "detail": "步行至高山駅 ～1分鐘\n到名古屋酒店 先寄存行李 15:00 Check-in",
             "tags": [
-              "JR",
-              "特急ひだ"
+              "JR特急ひだ",
+              "地鐵"
             ],
             "cost": "¥17,820",
-            "costUnit": "YEN"
-          },
-          {
-            "time": "12:30頃",
-            "name": "🚇 名古屋站 → 伏見",
-            "detail": "名古屋市営東山線 藤が丘行き → 伏見 10號出口\n～2分鐘\n先寄存行李（15:00 Check-in）",
-            "tags": [
-              "地下鐵",
-              "東山線"
+            "costUnit": "YEN",
+            "departBold": false,
+            "arrivalBold": false,
+            "routeLink": "https://www.navitime.co.jp/transfer/searchlist?orvStationCode=00002571&dnvStationCode=00007996&month=2026/7&day=1&hour=9&minute=0&sort=4&wspeed=100&basis=1&airplane=1&sprexprs=1&utrexprs=1&othexprs=1&mtrplbus=1&intercitybus=1&ferry=1&month=2026/7&day=1&hour=9&minute=0",
+            "infoLink": "",
+            "todos": [],
+            "expenses": [],
+            "routeLegs": [
+              {
+                "time": "09:36-12:04",
+                "type": "ＪＲ高山本線 特急ひだ6号 名古屋行き",
+                "stop": "名古屋 桜通り口",
+                "duration": "2小時28分鐘",
+                "fee": ""
+              },
+              {
+                "time": "",
+                "type": "名古屋市営東山線 藤が丘（愛知県）行き",
+                "stop": "伏見 10號出口",
+                "duration": "2分鐘",
+                "fee": "630"
+              },
+              {
+                "time": "",
+                "type": "步行",
+                "stop": "",
+                "duration": "2分鐘",
+                "fee": ""
+              }
             ],
-            "cost": "¥630",
-            "costUnit": "YEN"
+            "mapLinks": [
+              {
+                "label": "高山站",
+                "url": "https://maps.app.goo.gl/8N5wtpUpaq8uDMbv9"
+              },
+              {
+                "label": "名古屋酒店",
+                "url": "https://maps.app.goo.gl/jqFNmkbVaimr11q96"
+              }
+            ]
           },
           {
             "time": "13:00–15:30",
@@ -1323,7 +1670,7 @@ Task 2 · ¥200"></textarea></div>
     let activeView = 'both';
     let editMode = false;
     let activeStop = null;
-    let tripTitle = "🇯🇵 名古屋・高山・上高地 28/6–3/7 2026";
+    let tripTitle = "🇯🇵高山・上高地・名古屋 28/6–3/7 2026";
     let showingTodo = false;
 
     const TODO_CATEGORIES = ['🧳 行李', '📄 文件', '🎫 訂票/預約', '💊 藥物/衛生', '💰 金錢', '📱 電子產品', '🛍 購物清單', '其他'];
@@ -2119,6 +2466,7 @@ Task 2 · ¥200"></textarea></div>
             buildTabs();
             renderPlan();
             renderMapPanel();
+            resetHistory();
             setSyncStatus('☁ Synced', '#2e7d32', '#e6f4e6');
           } else {
             // Cloud is empty — seed it with the local data
@@ -2128,9 +2476,83 @@ Task 2 · ¥200"></textarea></div>
         .catch(() => setSyncStatus('☁ Offline', '#c0392b', '#fdecea'));
     }
 
-    function saveAll() {
+    // ===== Undo / Redo history =====
+    const undoStack = [];
+    const redoStack = [];
+    const HISTORY_MAX = 80;
+    let lastSnapshot = null;
+
+    function snapshot() {
+      return JSON.stringify({ tripTitle, DAYS, TODO_LIST });
+    }
+
+    function applySnapshot(json) {
+      const s = JSON.parse(json);
+      tripTitle = s.tripTitle;
+      TODO_LIST = Array.isArray(s.TODO_LIST) ? s.TODO_LIST : [];
+      DAYS.length = 0;
+      (s.DAYS || []).forEach(d => DAYS.push(d));
+    }
+
+    function updateUndoButtons() {
+      const u = document.getElementById('undoBtn');
+      const r = document.getElementById('redoBtn');
+      if (u) u.disabled = undoStack.length === 0;
+      if (r) r.disabled = redoStack.length === 0;
+    }
+
+    // Set the history baseline to the current state (called after load/sync)
+    function resetHistory() {
+      undoStack.length = 0;
+      redoStack.length = 0;
+      lastSnapshot = snapshot();
+      updateUndoButtons();
+    }
+
+    function persist() {
       localStorage.setItem('trip-planner-template', JSON.stringify({ tripTitle, DAYS, TODO_LIST }));
       cloudSave();
+    }
+
+    function rerenderAll() {
+      activeStop = null;
+      buildTabs();
+      renderPlan();
+      renderMapPanel();
+    }
+
+    function saveAll() {
+      // Record the state from before this change so it can be undone
+      if (lastSnapshot !== null) {
+        undoStack.push(lastSnapshot);
+        if (undoStack.length > HISTORY_MAX) undoStack.shift();
+        redoStack.length = 0;
+      }
+      lastSnapshot = snapshot();
+      updateUndoButtons();
+      persist();
+    }
+
+    function undo() {
+      if (!undoStack.length) return;
+      redoStack.push(snapshot());
+      const prev = undoStack.pop();
+      applySnapshot(prev);
+      lastSnapshot = prev;
+      updateUndoButtons();
+      persist();
+      rerenderAll();
+    }
+
+    function redo() {
+      if (!redoStack.length) return;
+      undoStack.push(snapshot());
+      const next = redoStack.pop();
+      applySnapshot(next);
+      lastSnapshot = next;
+      updateUndoButtons();
+      persist();
+      rerenderAll();
     }
 
     function loadSaved() {
@@ -2230,11 +2652,28 @@ ${src}
     }
 
     document.getElementById('exportBtn').onclick = exportHTML;
+    document.getElementById('undoBtn').onclick = undo;
+    document.getElementById('redoBtn').onclick = redo;
+
+    document.addEventListener('keydown', (e) => {
+      // Don't hijack native undo while typing in a field
+      const t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      const k = e.key.toLowerCase();
+      if ((e.metaKey || e.ctrlKey) && k === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) redo(); else undo();
+      } else if ((e.metaKey || e.ctrlKey) && k === 'y') {
+        e.preventDefault();
+        redo();
+      }
+    });
 
     loadSaved();
     buildTabs();
     renderPlan();
     renderMapPanel();
+    resetHistory();
     cloudLoad();
   </script>
 </body>
