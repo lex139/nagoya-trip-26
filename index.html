@@ -669,12 +669,31 @@
       .plan-panel,
       .plan-panel.full,
       .plan-panel.gone {
-        width: 100%;
+        width: 100% !important;
+        flex: none !important;
         height: auto;
         overflow: visible;
         overflow-y: visible;
       }
+
+      /* On mobile there's no Split view — toggle Plan / Map only */
+      .view-btn[data-view="both"] { display: none; }
+
+      /* Default on mobile: show plan, hide map */
       .map-panel { display: none; }
+
+      /* Map view: hide plan, show the map list full-height and scrollable */
+      body.view-map .plan-panel { display: none !important; }
+      body.view-map .map-panel {
+        display: flex !important;
+        height: calc(100vh - 130px);
+        min-height: 420px;
+      }
+      body.view-map .map-inner {
+        justify-content: flex-start;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
       .topbar {
         align-items: flex-start;
         position: sticky;
@@ -1055,7 +1074,7 @@ Task 2 · ¥200"></textarea></div>
         "label": "Day 2",
         "shortDate": "6/29",
         "color": "#2e7d6b",
-        "title": "🚠 新穗高纜車 → 高山老街",
+        "title": "🚠 新穗高纜車 → 🏮高山老街",
         "subtitle": "6月29日（月）· 濃飛巴士 → 新穗高 · 纜車 · 飛驒牛燒肉",
         "stops": [
           {
@@ -1515,39 +1534,117 @@ Task 2 · ¥200"></textarea></div>
           },
           {
             "time": "13:00–15:30",
-            "name": "🍽 午餐 + 🛍️ PARCO",
-            "detail": "步行至伏見站 ～10分鐘 → 名城線 → 矢場町 出口4\n名古屋 PARCO 購物",
+            "name": "🍽 午餐 + 🛍️ PARCO行街",
+            "detail": "步行～10分鐘至伏見站搭地鐵",
             "tags": [
-              "購物",
-              "午餐"
+              "午餐",
+              "購物"
             ],
             "cost": "¥210",
-            "costUnit": "YEN"
-          },
-          {
-            "time": "15:30–17:30",
-            "name": "💎 ミキモト 松坂屋名古屋店 — 珍珠",
-            "detail": "名古屋最有名珍珠店！\nKindal 二手服飾店 附近",
-            "tags": [
-              "購物",
-              "珍珠"
+            "costUnit": "YEN",
+            "departBold": false,
+            "arrivalBold": true,
+            "routeLink": "https://www.navitime.co.jp/transfer/searchlist?orvStationName=%E4%BC%8F%E8%A6%8B(%E6%84%9B%E7%9F%A5%E7%9C%8C)&dnvStationName=%E7%9F%A2%E5%A0%B4%E7%94%BA&month=2026%2F07&day=01&hour=13&minute=00&basis=1&freePass=0&sort=4&wspeed=100&airplane=1&sprexprs=1&utrexprs=1&othexprs=1&mtrplbus=1&intercitybus=1&ferry=1",
+            "infoLink": "",
+            "todos": [],
+            "expenses": [],
+            "routeLegs": [
+              {
+                "time": "",
+                "type": "名古屋市営東山線 藤が丘（愛知県）行き",
+                "stop": "栄",
+                "duration": "1分鐘",
+                "fee": "630"
+              },
+              {
+                "time": "",
+                "type": "名古屋市営 名城線 金山, 新瑞橋方面",
+                "stop": "矢場町　出口4",
+                "duration": "1分鐘",
+                "fee": ""
+              },
+              {
+                "time": "",
+                "type": "步行",
+                "stop": "",
+                "duration": "2分鐘",
+                "fee": ""
+              }
+            ],
+            "mapLinks": [
+              {
+                "label": "伏見站",
+                "url": "https://maps.app.goo.gl/GtuLC4dYb3tQpYUp7"
+              },
+              {
+                "label": "PARCO",
+                "url": "https://maps.app.goo.gl/m5URL5S1hdepdnxu7"
+              }
             ]
           },
           {
-            "time": "17:30頃",
-            "name": "🏨 酒店 Check-in — 名古屋",
-            "detail": "📍伏見駅 10號出口 步行 ～10分鐘",
+            "time": "15:30–17:30",
+            "name": "🛍️ 買買買",
+            "detail": "",
             "tags": [
-              "酒店"
+              "📍Mikimoto 珍珠",
+              "📍Kindal 二手服飾店",
+              "📍Polo Ralph Lauren"
+            ],
+            "departBold": false,
+            "arrivalBold": false,
+            "routeLink": "",
+            "infoLink": "",
+            "todos": [],
+            "expenses": [],
+            "routeLegs": [],
+            "mapLinks": [
+              {
+                "label": "珍珠",
+                "url": "https://maps.app.goo.gl/KRnbeBuwrRexB94M7"
+              },
+              {
+                "label": "Kindal",
+                "url": "https://maps.app.goo.gl/tCTvSzYbJiYJZvxg9"
+              },
+              {
+                "label": "Polo",
+                "url": "https://maps.app.goo.gl/QwSi59wWafvXuMLc8"
+              }
             ]
           },
           {
             "time": "18:30–19:30",
-            "name": "🍽 晚餐 — 名古屋",
-            "detail": "名古屋名物！味噌煮込みうどん・味噌カツなど",
-            "tags": [
-              "晚餐",
-              "名古屋名物"
+            "name": "🍽 晚餐",
+            "detail": "",
+            "tags": [],
+            "departBold": false,
+            "arrivalBold": false,
+            "routeLink": "",
+            "infoLink": "",
+            "todos": [],
+            "expenses": [],
+            "routeLegs": [],
+            "mapLinks": []
+          },
+          {
+            "time": "20:00",
+            "name": "返酒店",
+            "detail": "",
+            "tags": [],
+            "routeLink": "",
+            "mapsLink": "",
+            "todos": [],
+            "expenses": [],
+            "departBold": false,
+            "arrivalBold": false,
+            "infoLink": "",
+            "routeLegs": [],
+            "mapLinks": [
+              {
+                "label": "名古屋酒店",
+                "url": "https://maps.app.goo.gl/jqFNmkbVaimr11q96"
+              }
             ]
           }
         ]
@@ -1556,59 +1653,199 @@ Task 2 · ¥200"></textarea></div>
         "label": "Day 5",
         "shortDate": "7/2",
         "color": "#6b5b95",
-        "title": "🐱 吉卜力公園",
-        "subtitle": "7月2日（木）· 名古屋 → 藤が丘 → リニモ → 吉卜力公園 → 熱田蓬萊軒",
+        "title": "🌳 吉卜力公園",
+        "subtitle": "7月2日（木）· 吉卜力公園 → 熱田神社",
         "stops": [
           {
             "time": "09:00–10:15",
             "name": "🚇 酒店 → 吉卜力公園",
-            "detail": "步行至伏見站 ～10分鐘\n東山線 藤が丘行き → 藤が丘 ～25分鐘 ¥310\nリニモ 八草行き → 愛・地球博記念公園 出口2 ～13分鐘 ¥360",
+            "detail": "步行至伏見站 ～10分鐘乘搭地鐵\n",
             "tags": [
               "地下鐵",
               "リニモ"
             ],
             "cost": "¥670",
-            "costUnit": "YEN"
-          },
-          {
-            "time": "10:30–17:00",
-            "name": "🌳 吉卜力公園 (Ghibli Park)",
-            "detail": "全日遊覽！\n龍貓森林・魔女宅急便・哈爾移動城堡等\n步行 ～8分鐘入園",
-            "tags": [
-              "主題公園",
-              "吉卜力"
+            "costUnit": "YEN",
+            "departBold": true,
+            "arrivalBold": false,
+            "routeLink": "https://www.navitime.co.jp/transfer/searchlist?orvStationName=%E4%BC%8F%E8%A6%8B%28%E6%84%9B%E7%9F%A5%E7%9C%8C%29&orvStationCode=00007996&dnvStationName=%E6%84%9B%E3%83%BB%E5%9C%B0%E7%90%83%E5%8D%9A%E8%A8%98%E5%BF%B5%E5%85%AC%E5%9C%92&dnvStationCode=00009426&thr1StationName=&thr1StationCode=&thr2StationName=&thr2StationCode=&thr3StationName=&thr3StationCode=&year=2026&month=7&day=2&hour=9&minute=10&basis=1&freePass=0&sort=4&wspeed=100&airplane=1&sprexprs=1&utrexprs=1&othexprs=1&mtrplbus=1&intercitybus=1&ferry=1",
+            "infoLink": "",
+            "todos": [],
+            "expenses": [],
+            "routeLegs": [
+              {
+                "time": "",
+                "type": "名古屋市営東山線 藤が丘（愛知県）行き",
+                "stop": "藤が丘",
+                "duration": "25分鐘",
+                "fee": "930"
+              },
+              {
+                "time": "",
+                "type": "愛知高速交通東部 丘稜線リニモ 八草 行き",
+                "stop": "愛・地球博記念公園 出口2",
+                "duration": "13分鐘",
+                "fee": "1080"
+              },
+              {
+                "time": "",
+                "type": "步行",
+                "stop": "",
+                "duration": "8分鐘",
+                "fee": ""
+              }
             ],
-            "cost": "票價另計"
-          },
-          {
-            "time": "17:00–18:30",
-            "name": "🚇 吉卜力公園 → 熱田蓬萊軒",
-            "detail": "リニモ → 藤が丘 ¥360\n東山線 → 本山\n名城線 → 熱田神宮伝馬町 出口1 ¥340\n步行 ～6分鐘\n\n⚠️ 先攞號碼飛！等候1-2小時",
-            "tags": [
-              "電車"
-            ],
-            "cost": "¥700",
-            "costUnit": "YEN"
-          },
-          {
-            "time": "18:00–20:00",
-            "name": "🍱 晚餐 — 熱田蓬萊軒 鰻魚飯",
-            "detail": "名古屋最有名鰻魚飯！\n附近參觀 熱田神宮",
-            "tags": [
-              "鰻魚飯",
-              "晚餐",
-              "必食"
+            "mapLinks": [
+              {
+                "label": "吉卜力公園",
+                "url": "https://maps.app.goo.gl/Pk2XtthUeLHmL9Xe6"
+              }
             ]
           },
           {
-            "time": "20:00頃",
-            "name": "🚇 返酒店",
-            "detail": "熱田神宮伝馬町站\n名城線 → 栄 ¥240\n東山線 → 伏見 出口10 ¥\n步行 ～10分鐘",
+            "time": "10:30–17:00",
+            "name": "🌳 吉卜力公園",
+            "detail": "",
+            "tags": [],
+            "cost": "票價另計",
+            "departBold": false,
+            "arrivalBold": true,
+            "routeLink": "",
+            "infoLink": "",
+            "todos": [],
+            "expenses": [],
+            "routeLegs": [],
+            "mapLinks": []
+          },
+          {
+            "time": "17:00–19:00",
+            "name": "🚇 吉卜力公園 → 晚餐攞飛 → 熱田神宮",
+            "detail": "步行 ～10分鐘搭地鐵\n\n鰻魚飯⚠️先攞飛！",
             "tags": [
-              "地下鐵"
+              "リニモ",
+              "地鐵",
+              "📍熱田神宮"
+            ],
+            "cost": "¥700",
+            "costUnit": "YEN",
+            "departBold": false,
+            "arrivalBold": false,
+            "routeLink": "https://www.navitime.co.jp/transfer/searchlist?orvStationName=%E6%84%9B%E3%83%BB%E5%9C%B0%E7%90%83%E5%8D%9A%E8%A8%98%E5%BF%B5%E5%85%AC%E5%9C%92&dnvStationName=%E7%86%B1%E7%94%B0%E7%A5%9E%E5%AE%AE%E4%BC%9D%E9%A6%AC%E7%94%BA&month=2026%2F07&day=02&hour=17&minute=10&basis=1&freePass=0&sort=4&wspeed=100&orvStationCode=00009426&dnvStationCode=00006453&airplane=1&sprexprs=1&utrexprs=1&othexprs=1&mtrplbus=1&intercitybus=1&ferry=1",
+            "infoLink": "",
+            "todos": [],
+            "expenses": [],
+            "routeLegs": [
+              {
+                "time": "",
+                "type": "愛知高速交通東部丘稜線リニモ 藤が丘 行き",
+                "stop": "藤が丘",
+                "duration": "14分鐘",
+                "fee": "1080"
+              },
+              {
+                "time": "",
+                "type": "名古屋市営東山線 高畑 行き",
+                "stop": "本山",
+                "duration": "12分鐘",
+                "fee": ""
+              },
+              {
+                "time": "",
+                "type": "名古屋市営名城線 八事,新瑞橋方面",
+                "stop": "熱田神宮伝馬町 出口1",
+                "duration": "20分鐘",
+                "fee": "1020"
+              },
+              {
+                "time": "",
+                "type": "步行",
+                "stop": "",
+                "duration": "6分鐘",
+                "fee": ""
+              }
+            ],
+            "mapLinks": [
+              {
+                "label": "愛・地球博 記念公園站",
+                "url": "https://maps.app.goo.gl/U6J7oKANcrDQpPqd8"
+              },
+              {
+                "label": "熱田蓬萊軒",
+                "url": "https://maps.app.goo.gl/pRjQbhJpLDfRpBvv9"
+              },
+              {
+                "label": "熱田神宮",
+                "url": "https://maps.app.goo.gl/r1ByUMQoqXDsj29a8"
+              }
+            ]
+          },
+          {
+            "time": "19:00–20:00",
+            "name": "🍱 晚餐 — 熱田蓬萊軒 鰻魚飯",
+            "detail": "",
+            "tags": [],
+            "departBold": false,
+            "arrivalBold": false,
+            "routeLink": "",
+            "infoLink": "",
+            "todos": [],
+            "expenses": [],
+            "routeLegs": [],
+            "mapLinks": [
+              {
+                "label": "熱田蓬萊軒",
+                "url": "https://maps.app.goo.gl/pRjQbhJpLDfRpBvv9"
+              }
+            ]
+          },
+          {
+            "time": "20:00",
+            "name": "🚇 返酒店",
+            "detail": "步行 ～10分鐘到 熱田神宮伝馬町站 搭地鐵",
+            "tags": [
+              "地鐵"
             ],
             "cost": "¥240",
-            "costUnit": "YEN"
+            "costUnit": "YEN",
+            "departBold": false,
+            "arrivalBold": false,
+            "routeLink": "",
+            "infoLink": "",
+            "todos": [],
+            "expenses": [],
+            "routeLegs": [
+              {
+                "time": "",
+                "type": "名古屋市営名城線 金山,栄方面",
+                "stop": "栄",
+                "duration": "14分鐘",
+                "fee": "720"
+              },
+              {
+                "time": "",
+                "type": "名古屋市営東山線 高畑 行き",
+                "stop": "伏見　出口10",
+                "duration": "1分鐘",
+                "fee": ""
+              },
+              {
+                "time": "",
+                "type": "步行",
+                "stop": "",
+                "duration": "10分鐘",
+                "fee": ""
+              }
+            ],
+            "mapLinks": [
+              {
+                "label": "熱田神宮伝馬町站",
+                "url": "https://maps.app.goo.gl/XJ7Mh2wiV7DQLVAbA"
+              },
+              {
+                "label": "酒店",
+                "url": "https://maps.app.goo.gl/jqFNmkbVaimr11q96"
+              }
+            ]
           }
         ]
       },
@@ -1616,51 +1853,132 @@ Task 2 · ¥200"></textarea></div>
         "label": "Day 6",
         "shortDate": "7/3",
         "color": "#c77b2e",
-        "title": "🛍 大須商店街 → 回程",
-        "subtitle": "7月3日（木）· 大須 → 金山 → 中部機場 · μticket",
+        "title": "🛍 大須商店街 → ✈️ 中部機場",
+        "subtitle": "7月3日（木）· 大須商店街 → 中部機場 · μticket",
         "stops": [
           {
-            "time": "08:30–12:45",
-            "name": "🛍 酒店 → 大須商店街",
-            "detail": "步行至伏見站 ～10分鐘\n鶴舞線 赤池行き → 大須観音 ～2分鐘\n公用洗手間附近 locker / 2號出口 7-11寄存行李",
+            "time": "09:00-10:30",
+            "name": "酒店 → 🍞 早餐 — Konparu 昭和式吐司",
+            "detail": "步行至伏見站 ～10分鐘乘搭地鐵\n大須觀音站 公用洗手間附近 locker / 2號出口 7-11寄存行李",
             "tags": [
-              "購物",
-              "商店街"
+              "Check-out"
             ],
             "cost": "¥630",
-            "costUnit": "YEN"
+            "costUnit": "YEN",
+            "departBold": true,
+            "arrivalBold": false,
+            "routeLink": "https://maps.app.goo.gl/zXv3oMMgy2e4fjCt5",
+            "infoLink": "https://cloak.ecbo.io/zh-TW/jpn/city/aichi/1059",
+            "todos": [],
+            "expenses": [],
+            "routeLegs": [
+              {
+                "time": "",
+                "type": "名古屋市営鶴舞線 赤池（愛知県）行き",
+                "stop": "大須観音 2號出口",
+                "duration": "2分鐘",
+                "fee": "630"
+              },
+              {
+                "time": "",
+                "type": "步行",
+                "stop": "",
+                "duration": "10分鐘",
+                "fee": ""
+              }
+            ],
+            "mapLinks": [
+              {
+                "label": "伏見站",
+                "url": "https://maps.app.goo.gl/GtuLC4dYb3tQpYUp7"
+              },
+              {
+                "label": "Konparu",
+                "url": "https://maps.app.goo.gl/Bfwp6cTUjcEeoMsJ7"
+              }
+            ]
           },
           {
-            "time": "08:30–12:45",
-            "name": "🏮 大須商店街 探索",
-            "detail": "步行 ～9分鐘進商店街\n古著・電子・小吃・神社\n大須觀音",
+            "time": "11:00-12:50",
+            "name": "⛩️ 大須觀音 → 🏮 大須商店街",
+            "detail": "12:50左右去攞返寄存行李",
             "tags": [
-              "商店街",
-              "古著",
-              "美食"
+              "📍弁才天 大福",
+              "📍B-SIDE LABEL"
+            ],
+            "departBold": false,
+            "arrivalBold": true,
+            "routeLink": "",
+            "infoLink": "",
+            "todos": [],
+            "expenses": [],
+            "routeLegs": [],
+            "mapLinks": [
+              {
+                "label": "大須觀音",
+                "url": "https://maps.app.goo.gl/JMf8HR2DwpEDnZMG6"
+              },
+              {
+                "label": "弁才天 大福",
+                "url": "https://maps.app.goo.gl/Pw24WuaKBtv2eEsG7"
+              },
+              {
+                "label": "B-SIDE LABEL",
+                "url": "https://maps.app.goo.gl/QweU2Mc1LZyfXQQw7"
+              }
             ]
           },
           {
             "time": "13:00",
-            "name": "🚇 大須 → 金山站",
-            "detail": "步行至大須観音站 ～2分鐘\n鶴舞線 豊田市行き → 上前津 ～1分鐘 ¥360\n名城線 金山方面 → 金山 ～3分鐘",
+            "name": "🚇 大須觀音站 → ✈️ 中部機場",
+            "detail": "步行至大須観音站搭車\nUO691\t",
             "tags": [
-              "地下鐵"
+              "地鐵"
             ],
             "cost": "¥360",
-            "costUnit": "YEN"
-          },
-          {
-            "time": "13:30頃",
-            "name": "✈️ 金山 → 中部國際空港 → 香港",
-            "detail": "名鉄常滑・空港線\nミュースカイ 中部国際空港行き\n→ 中部国際空港 ～20分鐘\nμticket 使用！\n¥1,360",
-            "tags": [
-              "名鉄",
-              "μticket",
-              "機場"
+            "costUnit": "YEN",
+            "departBold": false,
+            "arrivalBold": false,
+            "routeLink": "https://trainbus.meitetsu.co.jp/meitetsu-transfer-zh-tw/pc/transfer/TransferSearch?dnvName=%E4%B8%AD%E9%83%A8%E5%9C%8B%E9%9A%9B%E6%A9%9F%E5%A0%B4%28TA24%29&orvName=%E9%87%91%E5%B1%B1%28NH34%29&goal=00009406&month=2026/07&hour=13&method=0&start=00001879&wspeed=standard&sort=0&basis=1&day=03&minute=30",
+            "infoLink": "",
+            "todos": [],
+            "expenses": [],
+            "routeLegs": [
+              {
+                "time": "",
+                "type": "名古屋市営鶴舞線 豊田市 行き",
+                "stop": "上前津",
+                "duration": "1分鐘",
+                "fee": "360"
+              },
+              {
+                "time": "",
+                "type": "名古屋市営名城線 金山,新瑞橋方面",
+                "stop": "金山",
+                "duration": "3分鐘",
+                "fee": ""
+              },
+              {
+                "time": "",
+                "type": "名鉄常滑・空港線ミュースカイ",
+                "stop": "中部国際空港",
+                "duration": "20分鐘",
+                "fee": "4080"
+              },
+              {
+                "time": "16:45-20:00",
+                "type": "✈️ UO691",
+                "stop": "",
+                "duration": "",
+                "fee": ""
+              }
             ],
-            "cost": "¥1,360",
-            "costUnit": "YEN"
+            "mapLinks": [
+              {
+                "label": "大須観音站",
+                "url": "https://maps.app.goo.gl/fNan6CR9FUCZFbfS9"
+              }
+            ]
           }
         ]
       }
@@ -2240,6 +2558,8 @@ Task 2 · ¥200"></textarea></div>
 
     function setView(view) {
       activeView = view;
+      document.body.classList.remove('view-both', 'view-plan', 'view-map');
+      document.body.classList.add('view-' + view);
       const plan = document.getElementById('planPanel');
       const map = document.getElementById('mapPanel');
       const activeBtn = document.querySelector(`[data-view="${view}"]`);
@@ -2674,6 +2994,9 @@ ${src}
     renderPlan();
     renderMapPanel();
     resetHistory();
+    // Establish the initial view; on mobile, Split collapses to Plan
+    const isMobile = window.matchMedia('(max-width: 900px)').matches;
+    setView(isMobile && activeView === 'both' ? 'plan' : activeView);
     cloudLoad();
   </script>
 </body>
