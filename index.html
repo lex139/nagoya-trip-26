@@ -716,7 +716,22 @@
       }
       .controls {
         width: 100%;
-        justify-content: space-between;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .view-toggle {
+        flex-shrink: 0;
+      }
+      /* Give the action buttons borders so they read as distinct chips when wrapped */
+      .controls .edit-toggle-btn {
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 5px 9px;
+        font-size: 10px;
+      }
+      #syncStatus {
+        margin-left: auto;
       }
     }
   </style>
@@ -1995,17 +2010,17 @@ Task 2 · ¥200"></textarea></div>
     let TODO_LIST = [
       {
         "text": "護照 (有效期 6 個月以上)",
-        "done": false,
+        "done": true,
         "category": "📄 文件"
       },
       {
         "text": "機票確認 (UO690)",
-        "done": false,
+        "done": true,
         "category": "🎫 訂票/預約"
       },
       {
         "text": "換日圓",
-        "done": false,
+        "done": true,
         "category": "💰 金錢"
       },
       {
@@ -2015,7 +2030,7 @@ Task 2 · ¥200"></textarea></div>
       },
       {
         "text": "旅遊保險",
-        "done": false,
+        "done": true,
         "category": "📄 文件"
       },
       {
